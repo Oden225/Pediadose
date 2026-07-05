@@ -102,6 +102,32 @@
   footer{padding:16px; text-align:center; font-size:.8rem; color:var(--muted); max-width:640px; margin:0 auto;}
   footer b{color:var(--teal);}
 
+  /* ===== Écran de connexion (numéro d'ordre) ===== */
+  #gate{position:fixed; inset:0; background:var(--teal); z-index:100;
+    display:flex; align-items:center; justify-content:center; padding:24px;}
+  #gate .box{background:#fff; border-radius:20px; padding:26px 22px; width:100%; max-width:360px;
+    box-shadow:0 12px 40px rgba(0,0,0,.25); text-align:center;}
+  #gate .icon{width:56px; height:56px; border-radius:16px; background:var(--teal-soft);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:1.6rem;}
+  #gate h2{font-size:1.15rem; color:var(--teal-dark); margin-bottom:4px;}
+  #gate p.desc{font-size:.85rem; color:var(--muted); margin-bottom:18px;}
+  #gate input{width:100%; text-align:center; font-size:1.4rem; font-weight:800; letter-spacing:.08em;
+    padding:12px 10px; border:2px solid var(--line); border-radius:12px; outline:none; color:var(--teal-dark);}
+  #gate input:focus{border-color:var(--teal);}
+  #gate button{width:100%; margin-top:12px; padding:12px; border:none; border-radius:12px;
+    background:var(--teal); color:#fff; font-size:1rem; font-weight:800; cursor:pointer;}
+  #gate button:active{background:var(--teal-dark);}
+  #gate .err{margin-top:12px; font-size:.82rem; font-weight:600; line-height:1.5; color:var(--red);
+    background:var(--red-bg); border-radius:9px; padding:10px 12px; display:none; text-align:left;}
+  #gate .err b{word-break:break-all;}
+  #gate .foot{margin-top:16px; font-size:.72rem; color:var(--muted); line-height:1.4;}
+  #app{display:none;}
+  header{position:relative;}
+  #who{position:absolute; top:12px; right:14px; background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.45); border-radius:999px; padding:4px 11px;
+    font-size:.72rem; font-weight:800; color:#fff; display:none; max-width:46%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
   /* ===== Sélecteur de thème ===== */
   .themes{display:flex; align-items:center; gap:6px; margin-top:10px; flex-wrap:wrap;}
   .themes .tl{font-size:.68rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; opacity:.75; margin-right:2px;}
@@ -146,9 +172,23 @@
 </head>
 <body data-mode="enfant" data-theme="soleil">
 
+<div id="gate">
+  <div class="box">
+    <div class="icon">🩺</div>
+    <h2>Accès réservé</h2>
+    <p class="desc">Entrez votre numéro d'ordre des médecins pour accéder à PédiaDose.</p>
+    <input id="ordre" type="text" inputmode="numeric" placeholder="Numéro d'ordre" autocomplete="off" maxlength="12">
+    <button onclick="tryLogin()">Entrer</button>
+    <div class="err" id="gateErr">Numéro d'ordre non reconnu. Contactez Dr Balet pour être ajouté.</div>
+    <div class="foot">Outil réservé aux professionnels de santé autorisés par Dr Balet.</div>
+  </div>
+</div>
+
+<div id="app">
 <header>
+  <div id="who"></div>
   <h1>PédiaDose</h1>
-  <div class="sub">Posologies par classe médicamenteuse — pédiatrie &amp; terrains particuliers · <b>v4</b></div>
+  <div class="sub">Posologies par classe médicamenteuse — pédiatrie &amp; terrains particuliers · <b>v5</b></div>
   <div class="themes"><span class="tl">Thème</span>
     <button class="tbtn on" id="th-soleil" onclick="setTheme('soleil')">Soleil</button>
     <button class="tbtn" id="th-garde" onclick="setTheme('garde')">Garde</button>
@@ -192,9 +232,69 @@
   Outil professionnel — <b>Dr Balet</b> · Tél. 07 67 08 74 94<br>
   D'après le cours de pharmacologie pédiatrique ; ne remplace ni le RCP ni le jugement clinique.
 </footer>
+</div>
 
 <script>
 "use strict";
+// ============ REGISTRE D'ACCÈS ============
+// Numéros d'ordre attribués par l'Ordre des Médecins de Côte d'Ivoire.
+// Ajoute ou modifie ici les entrées autorisées : "numéro": "Nom affiché".
+const REGISTRY = {
+  "11040": "Akéo Carmen",
+  "11118": "Balet Romaric",
+  "11240": "Konan Moïse",
+  "11198": "KYFE",
+  "11083": "Dembélé Tanfotchè",
+  "11031": "Kouassi David",
+  "11120": "Kouadio Serge",
+  "1998":  "Otchoa Owo",
+};
+const CONTACT_EMAIL = "djekoffiolivier84@gmail.com";
+
+function greeting(){
+  const h = new Date().getHours();
+  if (h < 12) return "Bonjour";
+  if (h < 18) return "Bon après-midi";
+  return "Bonsoir";
+}
+function tryLogin(){
+  const raw = document.getElementById("ordre").value.trim();
+  const err = document.getElementById("gateErr");
+  const nom = REGISTRY[raw];
+  if (nom){
+    localStorage.setItem("pediadose_ordre", raw);
+    err.style.display = "none";
+    unlock(nom, true);
+  } else {
+    err.innerHTML = "Accès refusé : ce numéro d'ordre n'est pas enregistré.<br>Pour demander l'autorisation, contactez le Dr Balet : <b>" + CONTACT_EMAIL + "</b>";
+    err.style.display = "block";
+  }
+}
+function unlock(nom, greet){
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  if (nom){
+    const w = document.getElementById("who");
+    w.textContent = "Dr " + nom;
+    w.style.display = "block";
+    if (greet) toastWelcome(nom);
+  }
+}
+function toastWelcome(nom){
+  const t = document.createElement("div");
+  t.textContent = greeting() + " Docteur " + nom;
+  t.style.cssText = "position:fixed;top:64px;left:50%;transform:translateX(-50%);"
+    + "background:#0F766E;color:#fff;padding:10px 18px;border-radius:999px;"
+    + "font-weight:700;font-size:.9rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.25);text-align:center;max-width:88vw";
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+document.getElementById("ordre").addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
+(function checkStoredAccess(){
+  const saved = localStorage.getItem("pediadose_ordre");
+  if (saved && REGISTRY[saved]) unlock(REGISTRY[saved], false);
+})();
+
 // ============ CLASSES ============
 const AP="Antipyrétiques", NS="AINS", ATB="Antibiotiques", PALU="Antipaludiques",
       ACV="Anticonvulsivants", CORT="Corticoïdes", BRON="Bronchodilatateurs",
