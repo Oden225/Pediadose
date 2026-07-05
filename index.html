@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PédiaDose — Dr Balet</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#0F766E">
+<style>
+  :root{
+    --teal:#0F766E; --teal-dark:#0B5A54; --teal-soft:#E4F2EF;
+    --ink:#1F2937; --muted:#64748B; --paper:#F5F9F8; --card:#FFFFFF; --line:#DBE7E3;
+    --red:#B91C1C; --red-bg:#FCEBEB; --amber:#B45309; --amber-bg:#FDF1E0;
+    --green:#15803D; --green-bg:#E7F4EB;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--paper); color:var(--ink); font-size:16px; line-height:1.45;}
+  .num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum";}
+
+  header{background:var(--teal); color:#fff; padding:14px 16px 12px;}
+  header h1{font-size:1.25rem; letter-spacing:.3px;}
+  header .sub{font-size:.78rem; opacity:.85; margin-top:2px;}
+  .warnbar{background:var(--amber-bg); color:var(--amber); font-size:.8rem;
+    padding:7px 16px; border-bottom:1px solid #F2DFC2; font-weight:600;}
+
+  .panel{background:var(--card); border-bottom:1px solid var(--line);
+    padding:14px 16px 12px; position:sticky; top:0; z-index:10; box-shadow:0 2px 8px rgba(15,118,110,.06);}
+  .modes{display:flex; gap:8px; margin-bottom:12px;}
+  .mode{flex:1; padding:9px 6px; border:2px solid var(--line); border-radius:12px;
+    background:#fff; font-weight:700; font-size:.95rem; color:var(--muted); text-align:center; cursor:pointer;}
+  .mode.on{border-color:var(--teal); color:var(--teal); background:var(--teal-soft);}
+
+  .inputs{display:flex; gap:10px;}
+  .field{flex:1;}
+  .field label{display:block; font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--muted); margin-bottom:4px;}
+  .field .box{display:flex; align-items:baseline; gap:6px; border:2px solid var(--line);
+    border-radius:14px; background:#fff; padding:5px 12px;}
+  .field .box:focus-within{border-color:var(--teal);}
+  .field input{border:none; outline:none; width:100%; font-size:1.9rem; font-weight:800;
+    color:var(--teal-dark); font-variant-numeric:tabular-nums; background:transparent;}
+  .field .unit{font-size:.95rem; font-weight:700; color:var(--muted);}
+  .field.small input{font-size:1.3rem;}
+
+  .terrains{display:none; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  body[data-mode="adulte"] .terrains{display:flex;}
+  body[data-mode="adulte"] #ageField{display:none;}
+  .chip{border:2px solid var(--line); border-radius:999px; padding:7px 12px;
+    font-size:.83rem; font-weight:700; color:var(--muted); background:#fff; cursor:pointer;}
+  .chip.on{border-color:var(--teal); background:var(--teal); color:#fff;}
+  .hint{margin-top:10px; font-size:.8rem; color:var(--amber); font-weight:600; display:none;}
+
+  .clsbar{display:flex; gap:8px; overflow-x:auto; padding:12px 16px 4px; -webkit-overflow-scrolling:touch; scrollbar-width:none;}
+  .clsbar::-webkit-scrollbar{display:none;}
+  .cls{flex:none; border:2px solid var(--line); border-radius:999px; padding:8px 14px;
+    font-size:.85rem; font-weight:700; color:var(--muted); background:#fff; cursor:pointer; white-space:nowrap;}
+  .cls.on{border-color:var(--teal); background:var(--teal); color:#fff;}
+
+  .clsnote{margin:8px 16px 0; max-width:608px; font-size:.83rem; font-weight:700;
+    color:var(--teal-dark); background:var(--teal-soft); border-radius:10px; padding:8px 12px;}
+  .search{padding:10px 16px 4px;}
+  .search input{width:100%; border:2px solid var(--line); border-radius:12px; padding:10px 14px;
+    font-size:1rem; outline:none; background:#fff;}
+  .search input:focus{border-color:var(--teal);}
+
+  main{padding:10px 16px 8px; max-width:640px; margin:0 auto;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:14px 16px; margin-bottom:12px;}
+  .card h2{font-size:1.02rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .tag{font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--teal); background:var(--teal-soft); border-radius:6px; padding:3px 7px;}
+  .tag.urgent{color:var(--red); background:var(--red-bg);}
+  .tag.hosp{color:var(--amber); background:var(--amber-bg);}
+  .dose{margin-top:10px; background:var(--teal-soft); border-radius:12px; padding:10px 12px;}
+  .dose .big{font-size:1.35rem; font-weight:800; color:var(--teal-dark);}
+  .dose .freq{font-size:.9rem; color:var(--ink); font-weight:600;}
+  .dose .ml{margin-top:6px; font-size:.95rem; font-weight:700; color:var(--teal-dark);}
+  .dose select{margin-top:6px; width:100%; padding:7px 10px; border:1.5px solid var(--line);
+    border-radius:9px; font-size:.9rem; background:#fff; color:var(--ink);}
+  .meta{margin-top:8px; font-size:.85rem; color:var(--muted);}
+  .cap{display:inline-block; margin-top:6px; font-size:.78rem; font-weight:700;
+    color:var(--amber); background:var(--amber-bg); border-radius:7px; padding:3px 8px;}
+  .alert{margin-top:8px; font-size:.85rem; font-weight:700; color:var(--red);
+    background:var(--red-bg); border-radius:9px; padding:7px 10px;}
+  .empty{color:var(--muted); font-size:1rem; font-weight:600; padding:6px 2px;}
+
+  .trow{display:flex; gap:9px; margin-top:8px; font-size:.86rem; align-items:flex-start;
+    border-radius:9px; padding:6px 8px;}
+  .trow .dot{width:11px; height:11px; border-radius:50%; margin-top:5px; flex:none;}
+  .trow b{flex:none;}
+  .ok .dot{background:var(--green);} .w .dot{background:var(--amber);} .ci .dot{background:var(--red);}
+  .trow.hl.ok{background:var(--green-bg);} .trow.hl.w{background:var(--amber-bg);} .trow.hl.ci{background:var(--red-bg);}
+  .adose{margin-top:8px; font-size:.98rem;} .adose b{color:var(--teal-dark);}
+
+  table{width:100%; border-collapse:collapse; margin-top:10px; font-size:.9rem;}
+  th,td{border:1px solid var(--line); padding:7px 6px; text-align:center;}
+  th{background:var(--teal-soft); color:var(--teal-dark); font-size:.78rem; text-transform:uppercase; letter-spacing:.04em;}
+  tr.hl td{background:var(--teal); color:#fff; font-weight:800;}
+
+  footer{padding:16px; text-align:center; font-size:.8rem; color:var(--muted); max-width:640px; margin:0 auto;}
+  footer b{color:var(--teal);}
+
+  /* ===== Sélecteur de thème ===== */
+  .themes{display:flex; align-items:center; gap:6px; margin-top:10px; flex-wrap:wrap;}
+  .themes .tl{font-size:.68rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; opacity:.75; margin-right:2px;}
+  .tbtn{border:1.5px solid rgba(255,255,255,.5); background:rgba(255,255,255,.1); color:#fff;
+    border-radius:999px; padding:5px 12px; font-size:.78rem; font-weight:700; cursor:pointer;}
+  .tbtn.on{background:#fff; color:#0B5A54; border-color:#fff;}
+  .kband{display:none; height:6px;
+    background:repeating-linear-gradient(90deg,#D97706 0 16px,#14532D 16px 32px,#231A12 32px 40px,#F1E3C3 40px 56px);}
+
+  /* — Thème Soleil : haute lisibilité plein jour — */
+  body[data-theme=soleil]{--paper:#FFFFFF; --card:#FFFFFF; --line:#8FA3B8; --ink:#0B1220; --muted:#44546A;
+    --teal-dark:#064E47; --teal-soft:#DDF0EC;}
+  body[data-theme=soleil] .card{border-width:2px;}
+  body[data-theme=soleil] .panel{box-shadow:none; border-bottom:2px solid #8FA3B8;}
+  body[data-theme=soleil] .dose .big{font-size:1.6rem;}
+  body[data-theme=soleil] .trow{font-size:.9rem;}
+
+  /* — Thème Garde : sombre OLED — */
+  body[data-theme=garde]{--paper:#0A1214; --card:#101D20; --line:#24393D; --ink:#E8F2F0; --muted:#93A8A4;
+    --teal:#2DD4BF; --teal-dark:#5EEAD4; --teal-soft:#123330; --red:#F87171; --red-bg:#341417;
+    --amber:#FBBF24; --amber-bg:#33260C; --green:#4ADE80; --green-bg:#0F2A18;}
+  body[data-theme=garde] header{background:#0E2E2A;}
+  body[data-theme=garde] .panel{background:#0D191C; box-shadow:none;}
+  body[data-theme=garde] .mode, body[data-theme=garde] .chip, body[data-theme=garde] .cls,
+  body[data-theme=garde] .field .box, body[data-theme=garde] .search input,
+  body[data-theme=garde] .dose select{background:#0D191C; color:var(--ink);}
+  body[data-theme=garde] .mode.on{background:var(--teal-soft);}
+  body[data-theme=garde] .chip.on, body[data-theme=garde] .cls.on{color:#06302B;}
+  body[data-theme=garde] .tbtn.on{color:#0E2E2A;}
+  body[data-theme=garde] th{background:#123330; color:#5EEAD4;}
+  body[data-theme=garde] tr.hl td{background:#115E56;}
+  body[data-theme=garde] .warnbar{border-bottom-color:#4A3A12;}
+
+  /* — Thème Akwaba : identité ivoirienne — */
+  body[data-theme=akwaba]{--paper:#FBF5EA; --card:#FFFDF8; --line:#E3D5BC; --ink:#2A2118; --muted:#7A6A55;
+    --teal:#14532D; --teal-dark:#0F3D21; --teal-soft:#E7EFE2; --amber:#B45309; --amber-bg:#F8E8D0;}
+  body[data-theme=akwaba] header{background:#14532D;}
+  body[data-theme=akwaba] .kband{display:block;}
+  body[data-theme=akwaba] .dose{border-left:5px solid #D97706;}
+  body[data-theme=akwaba] .tbtn.on{color:#14532D;}
+</style>
+</head>
+<body data-mode="enfant" data-theme="soleil">
+
+<header>
+  <h1>PédiaDose</h1>
+  <div class="sub">Posologies par classe médicamenteuse — pédiatrie &amp; terrains particuliers · <b>v4</b></div>
+  <div class="themes"><span class="tl">Thème</span>
+    <button class="tbtn on" id="th-soleil" onclick="setTheme('soleil')">Soleil</button>
+    <button class="tbtn" id="th-garde" onclick="setTheme('garde')">Garde</button>
+    <button class="tbtn" id="th-akwaba" onclick="setTheme('akwaba')">Akwaba</button>
+  </div>
+</header>
+<div class="kband"></div>
+<div class="warnbar">⚠ Aide au calcul (d'après le cours, p. 37-54) — vérifiez toujours avant de prescrire.</div>
+
+<div class="panel">
+  <div class="modes">
+    <div class="mode on" id="mEnfant" onclick="setMode('enfant')">Enfant<br><span style="font-weight:500;font-size:.75rem">dose au poids</span></div>
+    <div class="mode" id="mAdulte" onclick="setMode('adulte')">Adulte<br><span style="font-weight:500;font-size:.75rem">terrains particuliers</span></div>
+  </div>
+  <div class="inputs">
+    <div class="field">
+      <label for="w">Poids</label>
+      <div class="box"><input id="w" type="number" inputmode="decimal" min="1" max="150" placeholder="—" oninput="render()"><span class="unit">kg</span></div>
+    </div>
+    <div class="field small" id="ageField">
+      <label for="m">Âge</label>
+      <div class="box"><input id="m" type="number" inputmode="numeric" min="0" max="216" placeholder="—" oninput="render()"><span class="unit">mois</span></div>
+    </div>
+  </div>
+  <div class="terrains">
+    <div class="chip" id="tg" onclick="tog('g')">Grossesse</div>
+    <div class="chip" id="ta" onclick="tog('a')">Sujet âgé</div>
+    <div class="chip" id="tr" onclick="tog('r')">Rein (IR)</div>
+    <div class="chip" id="th" onclick="tog('h')">Foie (IH)</div>
+  </div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<div class="clsbar" id="clsbar"></div>
+<div class="clsnote" id="clsnote" style="display:none"></div>
+<div class="search"><input id="q" type="search" placeholder="Rechercher un produit…" oninput="render()"></div>
+
+<main id="list"></main>
+
+<footer>
+  Outil professionnel — <b>Dr Balet</b> · Tél. 07 67 08 74 94<br>
+  D'après le cours de pharmacologie pédiatrique ; ne remplace ni le RCP ni le jugement clinique.
+</footer>
+
+<script>
+"use strict";
+// ============ CLASSES ============
+const AP="Antipyrétiques", NS="AINS", ATB="Antibiotiques", PALU="Antipaludiques",
+      ACV="Anticonvulsivants", CORT="Corticoïdes", BRON="Bronchodilatateurs",
+      HTA="Antihypertenseurs", DIAR="Antidiarrhéiques", AUT="Autres";
+const CLASSES=["Tout",AP,ATB,PALU,DIAR,CORT,BRON,ACV,HTA,NS,AUT];
+const CLASS_NOTES={
+ [PALU]:"Palu grave (troubles de conscience, vomissements incoercibles, anémie sévère…) → artésunate + transfert.",
+ [DIAR]:"Base du traitement : SRO précoce + zinc. Les autres produits sont des appoints.",
+ [HTA]:"HTA de l'enfant : initiation et adaptation spécialisées — le calcul sert de repère.",
+ [ACV]:"Crise > 5 min : traiter ; libérer les voies aériennes, glycémie, position latérale.",
+ [NS]:"AINS : éviter si varicelle, déshydratation, dengue possible, ou infection sévère.",
+};
+
+// ============ DONNÉES (cours p.37-54 + compléments usuels) ============
+// perKg / perDayKg : nombre ou [min,max] (mg/kg) · prises : nb de prises/j
+// maxPrise / maxJour : plafonds absolus (mg) · minM : âge min (mois) · minW : poids min (kg)
+// unit : "mg" (défaut), autre = arrondi entier · multi : lignes calculées [libellé, mg/kg]
+// forms : {l, c: mg/ml} · g/a/r/h : grossesse / âgé / rein / foie — s : ok | w | ci
+const DRUGS=[
+// ---------- ANTIPYRÉTIQUES ----------
+ {id:"para", nom:"Paracétamol", cls:AP, tag:"Doliprane · Efferalgan",
+  ped:{perKg:15, freq:"toutes les 6 h (60 mg/kg/j en 4 prises)", maxPrise:1000, maxJour:4000,
+   note:"Sirop 2,4 % : pipette graduée en kg → remplir jusqu'au poids."},
+  forms:[{l:"Sirop 2,4 % (24 mg/ml)", c:24},{l:"Sachet / suppositoire (dose la plus proche)"},{l:"Cp 500 mg / 1 g"}],
+  adulte:"500 mg à 1 g toutes les 6 h — max 4 g/j (3 g si fragile).",
+  g:{s:"ok",t:"Antalgique-antipyrétique de référence."},
+  a:{s:"w",t:"Max 3 g/j si petit poids, dénutrition."},
+  r:{s:"w",t:"DFG < 30 : espacer d'au moins 6-8 h."},
+  h:{s:"w",t:"Max 2-3 g/j ; éviter si hépatopathie sévère ou alcoolisme."}},
+
+ {id:"aas", nom:"Acide acétylsalicylique", cls:AP, tag:"Aspégic · Aspirine",
+  ped:{perDayKg:50, prises:4, freq:"réparti toutes les 4 à 6 h",
+   note:"Usage restreint (Kawasaki, rhumatologie…) — pas en antipyrétique de routine. Jamais si varicelle, grippe ou dengue possible (Reye, saignement)."},
+  adulte:"500 mg à 1 g ×3/j max (3 g/j) — mêmes restrictions.",
+  g:{s:"ci",t:"CI dès 24 SA à dose antalgique ; éviter avant."},
+  a:{s:"w",t:"Risque hémorragique et rénal — prudence."},
+  r:{s:"ci",t:"À éviter ; CI si DFG < 30."},
+  h:{s:"ci",t:"À éviter (risque hémorragique)."}},
+
+// ---------- AINS ----------
+ {id:"ibu", nom:"Ibuprofène", cls:NS, tag:"AINS",
+  ped:{perKg:10, freq:"toutes les 8 h", maxPrise:400, maxJour:1200, minM:3,
+   note:"Éviter : varicelle, déshydratation, dengue possible, infection sévère."},
+  forms:[{l:"Sirop 20 mg/ml", c:20},{l:"Cp 200 / 400 mg"}],
+  adulte:"200-400 mg ×3/j — max 1 200 mg/j, durée courte.",
+  g:{s:"ci",t:"CI formelle dès 24 SA ; à éviter avant."},
+  a:{s:"w",t:"Prudence : rein, ulcère, HTA."},
+  r:{s:"ci",t:"À éviter ; CI si DFG < 30."},
+  h:{s:"ci",t:"À éviter (saignement, rétention hydrosodée)."}},
+
+ {id:"niflu", nom:"Acide niflumique (Nifluril)", cls:NS, tag:"Suppo enfant 400 mg",
+  ped:{perKg:0.1, unit:"suppositoire(s)", round:"floor", freq:"par jour (1 suppo / 10 kg / j)", maxPrise:3, minM:6,
+   note:"Mêmes précautions que tout AINS."},
+  adulte:"700 mg ×2/j max (formes adulte).",
+  g:{s:"ci",t:"CI dès 24 SA."}, a:{s:"w",t:"Prudence AINS."},
+  r:{s:"ci",t:"À éviter ; CI si DFG < 30."}, h:{s:"ci",t:"À éviter."}},
+
+ {id:"indo", nom:"Indométacine (Indocid)", cls:NS, tag:"Hospitalier", hosp:true,
+  fixed:"<b>PCA du prématuré</b> : 0,2 mg/kg IV toutes les 12 h — surveillance clinique et biologique étroite (usage néonatal hospitalier).",
+  adulte:"Usage néonatal hospitalier spécifique.",
+  g:{s:"ci",t:"—"}, a:{s:"w",t:"—"}, r:{s:"ci",t:"Néphrotoxique."}, h:{s:"w",t:"—"}},
+
+// ---------- ANTIBIOTIQUES ----------
+ {id:"amox", nom:"Amoxicilline", cls:ATB, tag:"Pénicilline A",
+  ped:{perDayKg:[50,100], prises:3, freq:"en 3 prises/j — VO ou IVD", maxJour:4000,
+   note:"Angine : 50 mg/kg/j en 2 prises. EI : allergie (urticaire, Quincke), troubles digestifs."},
+  forms:[{l:"Susp. 250 mg/5 ml (50 mg/ml)", c:50},{l:"Susp. 125 mg/5 ml (25 mg/ml)", c:25},{l:"Gélule/cp 500 mg – 1 g"}],
+  adulte:"1 g ×2 à 3/j selon l'indication.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS — adapter au rein."},
+  r:{s:"w",t:"DFG 10-30 : 2 prises/j · < 10 : 1 prise/j."},
+  h:{s:"ok",t:"RAS."}},
+
+ {id:"amcl", nom:"Amoxicilline + ac. clavulanique", cls:ATB, tag:"Pénicilline A",
+  ped:{perDayKg:[80,100], prises:3, freq:"en 3 prises/j — VO ou IVD (dose en amoxicilline)", maxJour:3000},
+  forms:[{l:"Susp. enfant 100 mg/ml", c:100},{l:"Sachet/cp 500 mg – 1 g"}],
+  adulte:"1 g ×2 à 3/j (max 3 g/j).",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS — adapter au rein."},
+  r:{s:"w",t:"Comme l'amoxicilline ; éviter si DFG < 10."},
+  h:{s:"w",t:"Risque d'hépatite cholestatique — CI si antécédent d'ictère sous clavulanate."}},
+
+ {id:"ceftri", nom:"Ceftriaxone", cls:ATB, tag:"C3G · pré-transfert", urgent:true,
+  ped:{perDayKg:[50,100], prises:1, freq:"×1/j — IVD (IM possible en pré-transfert)", maxJour:2000,
+   note:"Sepsis / méningite suspectée : dose puis évacuation."},
+  adulte:"1 à 2 g ×1/j.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"RAS aux doses usuelles."},
+  h:{s:"w",t:"Prudence si ictère / lithiase (élimination biliaire)."}},
+
+ {id:"cefo", nom:"Céfotaxime", cls:ATB, tag:"C3G",
+  ped:{perDayKg:[50,100], prises:2, freq:"en 2 injections/j — IVD", maxJour:6000},
+  adulte:"1 g ×2-3/j IV.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS."},
+  r:{s:"w",t:"Espacer si DFG < 10."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"genta", nom:"Gentamicine", cls:ATB, tag:"Aminoside", urgent:true,
+  ped:{perDayKg:[3,5], prises:2, freq:"en 2 IV lentes/j (cours) — souvent ×1/j en pratique",
+   note:"Néphrotoxicité, toxicité cochléo-vestibulaire : cure courte, hydratation, dosages si > 48 h."},
+  adulte:"3-5 mg/kg/j.",
+  g:{s:"w",t:"Seulement si indispensable (ototoxicité fœtale)."},
+  a:{s:"w",t:"Prudence : rein — adapter, dosages."},
+  r:{s:"ci",t:"À éviter ; si indispensable : espacer + dosages."},
+  h:{s:"ok",t:"RAS (surveiller le rein)."}},
+
+ {id:"netil", nom:"Nétilmicine", cls:ATB, tag:"Aminoside",
+  ped:{perDayKg:[5,7], prises:2, freq:"en 2 IM/j",
+   note:"Mêmes précautions que la gentamicine."},
+  adulte:"5-7 mg/kg/j.",
+  g:{s:"w",t:"Seulement si indispensable."}, a:{s:"w",t:"Prudence : rein."},
+  r:{s:"ci",t:"À éviter ; adapter + dosages."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"erythro", nom:"Érythromycine", cls:ATB, tag:"Macrolide",
+  ped:{perDayKg:[30,50], prises:3, freq:"en 2-3 prises/j — VO", maxJour:3000,
+   note:"EI : troubles digestifs, allongement du QT, interactions."},
+  adulte:"1 g ×2-3/j.",
+  g:{s:"ok",t:"Utilisable si nécessaire."}, a:{s:"w",t:"Prudence si QT long / interactions."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Métabolisme hépatique — éviter si IH sévère."}},
+
+ {id:"josa", nom:"Josamycine", cls:ATB, tag:"Macrolide",
+  ped:{perDayKg:[30,50], prises:2, freq:"en 2 prises/j — VO", maxJour:2000},
+  adulte:"1 g ×2/j.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Prudence — métabolisme hépatique."}},
+
+ {id:"azi", nom:"Azithromycine", cls:ATB, tag:"Macrolide",
+  ped:{perKg:20, freq:"1 prise/j pendant 3 jours", maxPrise:500, maxJour:500},
+  forms:[{l:"Susp. 200 mg/5 ml (40 mg/ml)", c:40},{l:"Cp 250 / 500 mg"}],
+  adulte:"500 mg ×1/j ×3 j.",
+  g:{s:"ok",t:"Possible si nécessaire."}, a:{s:"ok",t:"Prudence si QT long."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Prudence si IH sévère."}},
+
+ {id:"cefi", nom:"Céfixime", cls:ATB, tag:"C3G orale",
+  ped:{perDayKg:8, prises:2, freq:"en 2 prises/j", maxJour:400, minM:6},
+  forms:[{l:"Susp. enfant 100 mg/5 ml (20 mg/ml)", c:20},{l:"Susp. nourrisson 40 mg/5 ml (8 mg/ml)", c:8},{l:"Cp 200 mg"}],
+  adulte:"200 mg ×2/j.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS."},
+  r:{s:"w",t:"Demi-dose si DFG < 20."}, h:{s:"ok",t:"RAS."}},
+
+// ---------- ANTIPALUDIQUES ----------
+ {id:"al", nom:"Artéméther-luméfantrine 120/20", cls:PALU, tag:"Palu simple · 1ʳᵉ ligne",
+  bands:[[5,15,1],[15,25,2],[25,35,3],[35,999,4]],
+  bandNote:"×2/j pendant 3 jours (H0 puis H8, ensuite matin et soir) — avec repas ou lait.",
+  ped:{minW:5, note:"Signes de gravité → artésunate + transfert."},
+  adulte:"≥ 35 kg : 4 cp ×2/j ×3 j.",
+  g:{s:"w",t:"T1 : selon protocole national / avis · T2-T3 : utilisable."},
+  a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Prudence si IH sévère."}},
+
+ {id:"artesu", nom:"Artésunate", cls:PALU, tag:"Palu grave", urgent:true,
+  ped:{perKg:2.4, freq:"IV lente à H0, H12, H24, puis ×1/j",
+   note:"OMS : 3 mg/kg par dose si poids < 20 kg. Relais ACT dès que possible."},
+  adulte:"2,4 mg/kg même schéma.",
+  g:{s:"ok",t:"Traitement du palu grave, y compris grossesse."},
+  a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"artem", nom:"Artéméther IM", cls:PALU, tag:"Palu grave · alternative", urgent:true,
+  multi:[["J1 (charge)",3.2],["Puis J2 à J5, par jour",1.6]],
+  ped:{note:"Amp. 40 mg/0,5 ml ou 80 mg/1 ml — voie IM. Si artésunate disponible, le préférer."},
+  adulte:"Même schéma en mg/kg.",
+  g:{s:"w",t:"Si artésunate indisponible."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Prudence."}},
+
+ {id:"quinine", nom:"Quinine base", cls:PALU, tag:"Perfusion / VO",
+  ped:{perDayKg:24, prises:3, freq:"3 perfusions/j de 8 mg/kg chacune (ou VO)",
+   note:"Surveillance : glycémie (hypoglycémie), cardio. Amp. 125/250/500 mg."},
+  adulte:"24 mg/kg/j en 3 perfusions.",
+  g:{s:"ok",t:"Utilisable (hypoglycémie à surveiller)."},
+  a:{s:"w",t:"Prudence cardiaque."}, r:{s:"w",t:"Réduire d'1/3 à 1/2 si IR sévère."},
+  h:{s:"w",t:"Prudence, surveiller."}},
+
+// ---------- ANTIDIARRHÉIQUES ----------
+ {id:"sro", nom:"SRO — base du traitement", cls:DIAR, tag:"Toujours en premier",
+  fixed:"Administration <b>précoce</b>, après chaque selle liquide : < 2 ans <b>50-100 ml</b> · ≥ 2 ans <b>100-200 ml</b>, petites gorgées ou cuillère. Associer le <b>zinc</b>.",
+  adulte:"Boissons abondantes ; SRO si sujet fragile.",
+  g:{s:"ok",t:"RAS."}, a:{s:"ok",t:"Recommandé (fragilité)."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"zinc", nom:"Zinc (diarrhée)", cls:DIAR, tag:"OMS · avec SRO",
+  fixed:"< 6 mois : <b>10 mg ×1/j</b> · ≥ 6 mois : <b>20 mg ×1/j</b> — pendant 10 à 14 jours.",
+  adulte:"—",
+  g:{s:"ok",t:"RAS."}, a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"smecta", nom:"Diosmectite (Smecta)", cls:DIAR, tag:"Appoint",
+  fixed:"<b>4 sachets/j pendant 3 jours</b>, puis <b>2 sachets/j pendant 4 jours</b> — à distance des autres médicaments.",
+  adulte:"Même schéma.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"race", nom:"Racécadotril (Tiorfan)", cls:DIAR, tag:"Anti-sécrétoire",
+  ped:{perKg:1.5, freq:"par prise, ×3 à 4/j", maxPrise:100, minM:3},
+  adulte:"100 mg ×3/j.",
+  g:{s:"w",t:"Éviter par prudence (peu de données)."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Prudence (peu de données)."}},
+
+ {id:"ulevure", nom:"Ultra-Levure 250 (S. boulardii)", cls:DIAR, tag:"Probiotique",
+  fixed:"<b>1 sachet/j à partir de 2 ans</b>.",
+  ped:{minM:24}, adulte:"1-2 sachets/j.",
+  g:{s:"ok",t:"RAS."}, a:{s:"w",t:"Éviter si immunodépression / cathéter central."},
+  r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"nifurox", nom:"Nifuroxazide (Ercéfuryl)", cls:DIAR, tag:"Antiseptique intestinal",
+  fixed:"Cours : avant 6 mois <b>2 cuillerées-mesure/j</b> · dès 6 mois <b>3 cuillerées-mesure/j</b>. Prescription à documenter ; RCP récents restrictifs chez l'enfant — à réserver.",
+  adulte:"200 mg ×4/j.",
+  g:{s:"w",t:"Éviter par prudence."}, a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"metro", nom:"Métronidazole", cls:DIAR, tag:"Antiseptique · antiparasitaire",
+  ped:{perDayKg:[10,15], prises:3, freq:"en 3 prises/j, 7 à 10 jours (antiseptique intestinal)", maxJour:1500,
+   note:"Amibiase / giardiase : 40-50 mg/kg/j. Pas d'alcool."},
+  forms:[{l:"Susp. 125 mg/5 ml (25 mg/ml)", c:25},{l:"Cp 250 / 500 mg"}],
+  adulte:"500 mg ×3/j (amibiase 1,5 g/j, 7-10 j).",
+  g:{s:"w",t:"Utilisable ; éviter T1 si alternative."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"Espacer si DFG < 10."}, h:{s:"w",t:"Demi-dose si IH sévère."}},
+
+// ---------- CORTICOÏDES ----------
+ {id:"predni", nom:"Prednisone / Prednisolone", cls:CORT, tag:"VO",
+  ped:{perKg:[1,2], freq:"par jour, le matin (cure courte)", maxPrise:60, maxJour:60,
+   note:"Cp 1 / 5 / 20 mg. Long cours : K⁺ (2,5 mmol / 5 mg de prednisone), calcium + vit. D ; pansements gastriques inutiles chez l'enfant."},
+  adulte:"0,5 à 1 mg/kg/j en cure courte.",
+  g:{s:"w",t:"Possible si indiqué."}, a:{s:"w",t:"Prudence : diabète, HTA, infection."},
+  r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"Préférer la prednisolone (forme déjà active)."}},
+
+ {id:"methylp", nom:"Méthylprednisolone", cls:CORT, tag:"VO · IVD",
+  ped:{perKg:[1,2], freq:"par jour — VO ou IVD", maxPrise:120,
+   note:"Cp 4/16/32 mg · Amp. 20/40/120 mg."},
+  adulte:"0,5-1 mg/kg/j (bolus selon indication).",
+  g:{s:"w",t:"Possible si indiqué."}, a:{s:"w",t:"Prudence : diabète, HTA."},
+  r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"beta", nom:"Bétaméthasone", cls:CORT, tag:"VO · IVD",
+  ped:{perKg:[0.15,0.3], freq:"par jour — VO ou IVD", maxPrise:8,
+   note:"Cp 4 mg · Amp. 4/8 mg (≈ ×7 plus puissant que la prednisone)."},
+  adulte:"4 à 8 mg/j selon indication.",
+  g:{s:"w",t:"Possible (maturation fœtale : protocole)."}, a:{s:"w",t:"Prudence."},
+  r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"csi", nom:"Corticoïdes inhalés (CSI)", cls:CORT, tag:"Asthme · fond",
+  fixed:"Doses/j (cours) — <b>béclométasone</b> : 250-500 µg (fortes > 500) · <b>budésonide</b> : 200-400 µg (> 400) · <b>fluticasone</b> : 100-200 µg (> 200). Chambre d'inhalation chez l'enfant ; rincer la bouche.",
+  adulte:"Mêmes paliers, adaptés au contrôle.",
+  g:{s:"ok",t:"Poursuivre le traitement de fond."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+// ---------- BRONCHODILATATEURS ----------
+ {id:"salbuAD", nom:"Salbutamol inhalé (Ventoline)", cls:BRON, tag:"Crise",
+  ped:{perKg:0.5, unit:"bouffée(s)", freq:"par prise (0,5 bouffée/kg), via chambre — renouvelable toutes les 20 min la 1ʳᵉ heure", maxPrise:15,
+   note:"100 µg/bouffée. Échec après 1 h → corticoïde oral + transfert si gravité."},
+  adulte:"2 à 10 bouffées par prise selon la sévérité.",
+  g:{s:"ok",t:"Utilisable (référence dans l'asthme)."}, a:{s:"ok",t:"RAS (tachycardie)."},
+  r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"salbuNeb", nom:"Salbutamol nébulisation", cls:BRON, tag:"Crise · cabinet",
+  ped:{perKg:0.15, freq:"par nébulisation (sol. 2,5 mg/2,5 ml), renouvelable", maxPrise:5,
+   note:"1 mg = 1 ml de solution. Sous O₂ si possible ; min. usuel 2,5 mg."},
+  forms:[{l:"Solution 2,5 mg/2,5 ml (1 mg/ml)", c:1}],
+  adulte:"5 mg par nébulisation.",
+  g:{s:"ok",t:"Utilisable."}, a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+// ---------- ANTICONVULSIVANTS ----------
+ {id:"diaz", nom:"Diazépam (Valium)", cls:ACV, tag:"Crise", urgent:true,
+  ped:{perKg:[0.5,1], freq:"par jour — IR / IM / VO ; renouvelable à 30 min si échec", maxJour:0, 
+   note:"Max 3 mg/kg/j (cours). En pratique IR au cabinet : 0,5 mg/kg sans dépasser 10 mg par administration. Surveillance respiratoire."},
+  adulte:"10 mg IR ou IV lente.",
+  g:{s:"w",t:"Convulsions + grossesse : penser éclampsie → MgSO₄ + transfert."},
+  a:{s:"w",t:"Demi-dose (sédation, chutes)."},
+  r:{s:"ok",t:"RAS en aigu."},
+  h:{s:"ci",t:"Risque d'encéphalopathie — éviter si IH sévère."}},
+
+ {id:"gardenal", nom:"Phénobarbital (Gardénal)", cls:ACV, tag:"Charge", urgent:true, hosp:true,
+  ped:{perKg:[15,20], freq:"dose de charge en IVD lente sur 20 min (ou VO ×1/j) — surveiller la respiration",
+   note:"EI : dépression respiratoire initiale, somnolence, difficultés de tétée."},
+  adulte:"Charge 10-15 mg/kg IV lente.",
+  g:{s:"w",t:"Si nécessaire (tératogène connu — avis)."},
+  a:{s:"w",t:"Sédation — réduire."},
+  r:{s:"w",t:"Espacer si IR sévère."},
+  h:{s:"ci",t:"CI si IH sévère (encéphalopathie)."}},
+
+ {id:"dihydan", nom:"Phénytoïne (Di-Hydan)", cls:ACV, tag:"Spécialisé", hosp:true,
+  fixed:"Cours : <b>20-30 mg/kg/j en 2-3 prises VO</b> — ⚠ correspond plutôt à une dose de charge ; entretien usuel plus faible (≈ 5-8 mg/kg/j). Initiation et suivi spécialisés, taux plasmatiques.",
+  adulte:"Charge 15-20 mg/kg ; entretien 300-400 mg/j — taux.",
+  g:{s:"w",t:"Tératogène — avis spécialisé."}, a:{s:"w",t:"Réduire, taux."},
+  r:{s:"w",t:"Fraction libre ↑ — taux."}, h:{s:"w",t:"Métabolisme hépatique — réduire, taux."}},
+
+// ---------- ANTIHYPERTENSEURS ----------
+ {id:"furo", nom:"Furosémide (Lasilix)", cls:HTA, tag:"Diurétique",
+  ped:{perDayKg:[1,2], prises:1, freq:"par jour — VO ou IV",
+   note:"EI : déplétion potassique."},
+  adulte:"20-40 mg/j (plus si œdèmes).",
+  g:{s:"w",t:"Seulement sur indication (pas pour l'HTA gravidique)."},
+  a:{s:"w",t:"Déshydratation, hypoK⁺ — surveiller."},
+  r:{s:"ok",t:"Utilisable (doses parfois ↑)."},
+  h:{s:"w",t:"Prudence si cirrhose : hypoK⁺, encéphalopathie."}},
+
+ {id:"spiro", nom:"Spironolactone (Aldactone)", cls:HTA, tag:"Diurétique épargneur K⁺",
+  ped:{perDayKg:[3,5], prises:1, freq:"par jour — VO", note:"EI : hyperkaliémie, gynécomastie."},
+  adulte:"25-100 mg/j.",
+  g:{s:"ci",t:"À éviter (anti-androgène)."},
+  a:{s:"w",t:"Surveiller K⁺ et créatinine."},
+  r:{s:"ci",t:"CI si DFG < 30 (hyperK⁺)."},
+  h:{s:"ok",t:"Souvent utile (ascite) — surveiller K⁺."}},
+
+ {id:"capto", nom:"Captopril", cls:HTA, tag:"IEC",
+  ped:{perKg:[0.3,0.5], freq:"par dose (×2-3/j selon prescription)",
+   note:"EI : toux, vertiges. Surveiller créatinine et K⁺."},
+  adulte:"25-50 mg ×2-3/j.",
+  g:{s:"ci",t:"CI (toxicité fœtale) — tous trimestres."},
+  a:{s:"w",t:"Débuter bas, surveiller rein/K⁺."},
+  r:{s:"w",t:"Réduire ; surveiller créatinine et K⁺."},
+  h:{s:"ok",t:"RAS."}},
+
+ {id:"enala", nom:"Énalapril", cls:HTA, tag:"IEC",
+  ped:{perDayKg:[0.08,0.6], prises:1, freq:"par jour — VO"},
+  adulte:"5-20 mg/j.",
+  g:{s:"ci",t:"CI — tous trimestres."},
+  a:{s:"w",t:"Débuter bas."},
+  r:{s:"w",t:"Réduire ; surveiller."},
+  h:{s:"ok",t:"RAS."}},
+
+ {id:"losar", nom:"Losartan", cls:HTA, tag:"ARA2",
+  ped:{perDayKg:[0.75,1.44], prises:1, freq:"par jour — VO",
+   note:"Classe : céphalées, vertiges, toux plus rare qu'IEC."},
+  adulte:"50-100 mg/j.",
+  g:{s:"ci",t:"CI — tous trimestres."}, a:{s:"w",t:"Débuter bas."},
+  r:{s:"w",t:"Surveiller rein/K⁺."}, h:{s:"w",t:"Réduire (métabolisme hépatique)."}},
+
+ {id:"valsar", nom:"Valsartan", cls:HTA, tag:"ARA2",
+  ped:{perDayKg:2, prises:1, freq:"par jour — VO"},
+  adulte:"80-160 mg/j.",
+  g:{s:"ci",t:"CI — tous trimestres."}, a:{s:"w",t:"Débuter bas."},
+  r:{s:"w",t:"Surveiller."}, h:{s:"w",t:"Réduire si IH."}},
+
+ {id:"cande", nom:"Candésartan", cls:HTA, tag:"ARA2",
+  ped:{perDayKg:[0.16,0.5], prises:1, freq:"par jour — VO"},
+  adulte:"8-16 mg/j.",
+  g:{s:"ci",t:"CI — tous trimestres."}, a:{s:"w",t:"Débuter bas."},
+  r:{s:"w",t:"Surveiller."}, h:{s:"w",t:"Réduire si IH."}},
+
+ {id:"amlo", nom:"Amlodipine", cls:HTA, tag:"Inhibiteur calcique",
+  ped:{perKg:[0.06,0.3], freq:"par dose, ×1/j — VO",
+   note:"Classe : vasodilatation, tachycardie, œdèmes."},
+  adulte:"5-10 mg/j.",
+  g:{s:"w",t:"Possible si nécessaire (avis)."}, a:{s:"ok",t:"Bien toléré (œdèmes)."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Réduire (métabolisme hépatique)."}},
+
+ {id:"nicar", nom:"Nicardipine (Loxen)", cls:HTA, tag:"Inhibiteur calcique",
+  ped:{perDayKg:0.5, prises:1, freq:"par jour — IV / VO (urgences hypertensives : IV titrée)"},
+  adulte:"LP 50 mg ×2/j ; IV titrée en urgence.",
+  g:{s:"ok",t:"Référence de l'HTA gravidique sévère (IV)."},
+  a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Réduire."}},
+
+ {id:"nife", nom:"Nifédipine (Adalate)", cls:HTA, tag:"Inhibiteur calcique",
+  ped:{perDayKg:[0.25,0.5], prises:1, freq:"par jour — VO (formes LP)"},
+  adulte:"LP 30-60 mg/j.",
+  g:{s:"w",t:"Utilisée dans l'HTA gravidique (formes LP)."},
+  a:{s:"w",t:"Éviter formes rapides."}, r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Réduire."}},
+
+ {id:"propra", nom:"Propranolol", cls:HTA, tag:"Bêtabloquant",
+  ped:{perDayKg:1, prises:2, freq:"par jour, en 2-3 prises — VO ou IV",
+   note:"EI : asthénie, bradycardie, BAV. CI : asthme."},
+  adulte:"40-160 mg/j.",
+  g:{s:"w",t:"Possible (préférer labétalol) — RCIU à surveiller."},
+  a:{s:"w",t:"Bradycardie — surveiller."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Réduire nettement (fort métabolisme hépatique)."}},
+
+// ---------- AUTRES ----------
+ {id:"alb", nom:"Albendazole", cls:AUT, tag:"Déparasitage",
+  fixed:"12-24 mois : <b>200 mg</b> prise unique · > 2 ans et adulte : <b>400 mg</b> prise unique.",
+  ped:{minM:12}, adulte:"400 mg prise unique (selon parasitose).",
+  g:{s:"ci",t:"CI au 1ᵉʳ trimestre."}, a:{s:"ok",t:"RAS."},
+  r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Surveiller les transaminases si cure prolongée."}},
+
+ {id:"fer", nom:"Fer élément", cls:AUT, tag:"Anémie ferriprive",
+  ped:{perKg:3, freq:"par jour, en 1-2 prises (jusqu'à 6 mg/kg/j selon sévérité)", maxJour:180,
+   note:"Contrôle NFS ; à distance du thé."},
+  adulte:"100-200 mg/j de fer élément.",
+  g:{s:"ok",t:"Recommandé si carence (+ acide folique)."},
+  a:{s:"ok",t:"RAS (tolérance digestive)."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."}},
+
+ {id:"ceti", nom:"Cétirizine", cls:AUT, tag:"Antihistaminique",
+  fixed:"2-6 ans : <b>2,5 mg ×2/j</b> · 6-12 ans : <b>5 mg ×2/j</b> · > 12 ans et adulte : <b>10 mg ×1/j</b>.",
+  ped:{minM:24}, adulte:"10 mg ×1/j.",
+  g:{s:"w",t:"Possible si nécessaire."}, a:{s:"w",t:"Somnolence possible."},
+  r:{s:"w",t:"Demi-dose si IR."}, h:{s:"w",t:"Espacer les prises si IH."}},
+];
+
+// ============ ÉTAT ============
+const S={mode:"enfant", cls:"Tout", theme:"soleil", terr:{g:false,a:false,r:false,h:false}, formSel:{}};
+
+function setTheme(t){S.theme=t; document.body.dataset.theme=t;
+  for(const x of ["soleil","garde","akwaba"])
+    document.getElementById("th-"+x).classList.toggle("on",x===t);}
+function setMode(m){S.mode=m; document.body.dataset.mode=m;
+  document.getElementById("mEnfant").classList.toggle("on",m==="enfant");
+  document.getElementById("mAdulte").classList.toggle("on",m==="adulte"); render();}
+function tog(k){S.terr[k]=!S.terr[k];
+  document.getElementById("t"+k).classList.toggle("on",S.terr[k]); render();}
+function setCls(c){S.cls=c; drawCls(); render();}
+function selForm(id,i){S.formSel[id]=+i; render();}
+function drawCls(){
+  document.getElementById("clsbar").innerHTML=CLASSES.map(c=>
+    `<div class="cls${c===S.cls?" on":""}" onclick="setCls('${c.replace(/'/g,"\\'")}')">${c}</div>`).join("");
+  const n=document.getElementById("clsnote"), t=CLASS_NOTES[S.cls];
+  n.style.display=t?"block":"none"; if(t) n.textContent=t;
+}
+
+// ============ FORMATS & CALCULS ============
+const fr=n=>(""+n).replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g," ");
+function fmtMg(mg){ if(mg>=100) mg=Math.round(mg/5)*5; else mg=Math.round(mg*10)/10; return fr(mg); }
+function fmtMl(ml){ ml=ml<5?Math.round(ml*10)/10:Math.round(ml*2)/2; return fr(ml); }
+const rng=v=>Array.isArray(v)?v.slice():[v,v];
+function showRange([a,b],f){ return a===b?f(a):f(a)+" – "+f(b); }
+
+function terrRows(d){
+  return [["g","Grossesse",d.g],["a","Sujet âgé",d.a],["r","Rein",d.r],["h","Foie",d.h]].map(([k,lb,o])=>{
+    if(!o) return "";
+    return `<div class="trow ${o.s}${S.terr[k]?" hl":""}"><span class="dot"></span><b>${lb} :</b><span>${o.t}</span></div>`;
+  }).join("");
+}
+
+function pedBlock(d,w,m){
+  let h=""; const p=d.ped||{};
+  if(p.minM&&m!==null&&m<p.minM)
+    h+=`<div class="alert">Âge minimum : ${p.minM>=24?(p.minM/12)+" ans":p.minM+" mois"} — non indiqué ici.</div>`;
+  if(p.minW&&w&&w<p.minW)
+    h+=`<div class="alert">Poids minimum : ${p.minW} kg — forme non adaptée, avis/transfert.</div>`;
+
+  if(d.bands){
+    if(!w) return h+`<div class="empty">Entrez le poids pour surligner la ligne.</div>`;
+    h+=`<table><tr><th>Poids</th><th>Comprimés / prise</th></tr>`;
+    for(const [a,b,n] of d.bands){
+      h+=`<tr${w>=a&&w<b?' class="hl"':''}><td class="num">${a} – ${b===999?"…":"&lt; "+b} kg</td><td class="num">${n} cp</td></tr>`;
+    }
+    h+=`</table><div class="meta">${d.bandNote}</div>`;
+    if(p.note) h+=`<div class="alert">${p.note}</div>`;
+    return h;
+  }
+  if(d.multi){
+    if(!w) return h+`<div class="empty">Entrez le poids ↑</div>`;
+    h+=`<div class="dose">`+d.multi.map(([lb,k])=>
+      `<div class="freq num"><b>${lb} :</b> ≈ <span class="big num" style="font-size:1.15rem">${fmtMg(k*w)} mg</span></div>`).join("")+`</div>`;
+    if(p.note) h+=`<div class="meta">${p.note}</div>`;
+    return h;
+  }
+  if(d.fixed){
+    h+=`<div class="dose"><div class="freq">${d.fixed}</div></div>`;
+    if(p.note) h+=`<div class="meta">${p.note}</div>`;
+    return h;
+  }
+  if(!w) return h+`<div class="empty">Entrez le poids ↑</div>`;
+
+  const unit=p.unit||"mg"; let capped=false, per, line2="";
+  if(p.perKg!==undefined){
+    per=rng(p.perKg).map(k=>k*w);
+    if(unit!=="mg") per=per.map(v=>Math.max(1,p.round==="floor"?Math.floor(v):Math.round(v)));
+    if(p.maxPrise){ if(per[1]>p.maxPrise) capped=true;
+      per=per.map(v=>Math.min(v,p.maxPrise)); }
+    if(unit==="mg"&&p.maxJour){
+      const nb=p.freq.includes("6 h")?4:p.freq.includes("8 h")?3:p.freq.includes("12 h")?2:1;
+      line2=`<div class="meta num">Maximum sur 24 h : ${fmtMg(Math.min(per[1]*nb,p.maxJour))} mg.</div>`;
+    }
+    const f=unit==="mg"?fmtMg:(x=>fr(x));
+    h+=`<div class="dose"><span class="big num">≈ ${showRange(per,f)} ${unit}</span> <span class="freq">/ prise — ${p.freq}</span>`;
+  }else{
+    let day=rng(p.perDayKg).map(k=>k*w);
+    if(p.maxJour){ if(day[1]>p.maxJour) capped=true; day=day.map(v=>Math.min(v,p.maxJour)); }
+    per=day.map(v=>v/(p.prises||1));
+    h+=`<div class="dose"><span class="big num">≈ ${showRange(day,fmtMg)} mg / jour</span> <span class="freq">— ${p.freq}</span>`;
+    if((p.prises||1)>1)
+      h+=`<div class="freq num" style="margin-top:4px">soit ≈ <b>${showRange(per,fmtMg)} mg par prise</b> ×${p.prises}</div>`;
+  }
+  if(d.forms&&unit==="mg"){
+    const idx=S.formSel[d.id]??0, f=d.forms[idx];
+    if(f&&f.c) h+=`<div class="ml num">≈ ${showRange(per.map(v=>v/f.c),fmtMl)} ml par prise <span style="font-weight:500">(${f.l})</span></div>`;
+    if(d.forms.length>1){
+      h+=`<select onchange="selForm('${d.id}',this.value)">`+
+        d.forms.map((o,i)=>`<option value="${i}"${i===idx?" selected":""}>${o.l}</option>`).join("")+`</select>`;
+    } else if(f&&!f.c) h+=`<div class="ml">${f.l}</div>`;
+  }
+  h+=`</div>`+line2;
+  if(capped) h+=`<span class="cap">Plafond appliqué — dose maximale atteinte</span>`;
+  if(p.note) h+=`<div class="meta">${p.note}</div>`;
+  return h;
+}
+
+function adultBlock(d){
+  return `<div class="adose"><b>Dose adulte :</b> ${d.adulte}</div>`+terrRows(d);
+}
+
+function render(){
+  const w=parseFloat(document.getElementById("w").value)||0;
+  const mv=document.getElementById("m").value, m=mv===""?null:parseInt(mv,10);
+  const q=document.getElementById("q").value.trim().toLowerCase();
+  const hint=document.getElementById("hint"); hint.style.display="none";
+  if(S.mode==="enfant"&&w>45){
+    hint.textContent="Poids > 45 kg : plafonds adulte appliqués — voir aussi le mode Adulte.";
+    hint.style.display="block";
+  }
+  let out="";
+  for(const d of DRUGS){
+    if(S.cls!=="Tout"&&d.cls!==S.cls) continue;
+    if(q&&!(d.nom+" "+d.tag+" "+d.cls).toLowerCase().includes(q)) continue;
+    out+=`<div class="card"><h2>${d.nom} <span class="tag${d.urgent?" urgent":""}">${d.tag}</span>${d.hosp?' <span class="tag hosp">Hospitalier</span>':''}</h2>`;
+    out+=S.mode==="enfant"?pedBlock(d,w,m):adultBlock(d);
+    out+=`</div>`;
+  }
+  document.getElementById("list").innerHTML=out||`<div class="empty">Aucun produit ne correspond.</div>`;
+}
+drawCls(); render();
+if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
+  navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
