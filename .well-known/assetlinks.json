@@ -1,8 +1,8 @@
 [{
-  "relation" : ["delegate_permission/common.handle_all_urls"],
-  "cable": {
-    "espace de noms": "android_app",
-    "nom_du_package": "io.github.oden225.twa",
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.oden225.twa",
     "sha256_cert_fingerprints": ["F2:2E:1F:D5:44:0B:53:5E:25:51:7F:35:CC:A1:DA:EA:FB:79:D2:73:A8:03:91:5B:6F:B2:70:03:A5:F9:6C:8E"]
   }
 }]
