@@ -1,5 +1,5 @@
 // PédiaDose — Service Worker (offline-first app shell) — chemins à plat
-const CACHE = "pediadose-v5";
+const CACHE = "pediadose-2.1.0";
 const ASSETS = [
   "./",
   "./index.html",
