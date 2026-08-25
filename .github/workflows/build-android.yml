@@ -26,10 +26,17 @@ jobs:
       - name: Install Capacitor
         run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
+      - name: Prepare www folder
+        run: |
+          mkdir -p www
+          cp index.html sw.js manifest.webmanifest www/ 2>/dev/null || true
+          cp -r icon-*.png apple-touch-icon* favicon-32.png maskable-*.png www/ 2>/dev/null || true
+          cp -r .well-known www/ 2>/dev/null || true
+
       - name: Init Capacitor (if not already configured)
         run: |
           if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
-            npx cap init pediadose com.pediadose.app --web-dir=.
+            npx cap init pediadose com.pediadose.app --web-dir=www
           fi
 
       - name: Add Android platform
