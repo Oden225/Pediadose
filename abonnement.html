@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Normodose — Abonnement</title>
+<meta name="theme-color" content="#0F766E">
+<style>
+  :root{
+    --teal:#0F766E; --teal-dark:#0B5A54; --teal-soft:#E4F2EF;
+    --ink:#1F2937; --muted:#64748B; --card:#FFFFFF; --line:#DBE7E3;
+    --amber:#B45309; --amber-bg:#FDF1E0; --green:#15803D; --green-bg:#E7F4EB;
+    --red:#B91C1C; --red-bg:#FCEBEB;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink); font-size:16px; line-height:1.5;
+    background:#F1F7F5; min-height:100vh;}
+  .wrap{max-width:520px; margin:0 auto; padding:max(18px,env(safe-area-inset-top)) 16px 40px;}
+
+  .top{background:radial-gradient(120% 90% at 50% -20%, #12897F, var(--teal) 55%, var(--teal-dark));
+    color:#fff; border-radius:0 0 26px 26px; padding:26px 20px 30px; text-align:center; margin:-18px -16px 18px;}
+  .top .mark{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+  .top h1{font-size:1.35rem; font-weight:800;}
+  .top p{font-size:.85rem; opacity:.85; margin-top:2px;}
+
+  .card{background:var(--card); border-radius:18px; padding:18px; box-shadow:0 8px 26px -18px rgba(11,90,84,.4); margin-bottom:14px;}
+  .card h2{font-size:1.02rem; color:var(--teal-dark); font-weight:800; margin-bottom:6px;}
+  .card h2 .n{display:inline-flex; width:22px; height:22px; border-radius:50%; background:var(--teal-soft); color:var(--teal-dark);
+    font-size:.8rem; align-items:center; justify-content:center; margin-right:8px;}
+  .sub{font-size:.85rem; color:var(--muted); margin-bottom:12px;}
+
+  .status{border-radius:14px; padding:13px 15px; font-weight:600; font-size:.9rem; text-align:center; margin-bottom:14px;}
+  .status.ok{background:var(--green-bg); color:var(--green);}
+  .status.trial{background:var(--teal-soft); color:var(--teal-dark);}
+  .status.free{background:var(--amber-bg); color:var(--amber);}
+
+  .plans{display:grid; gap:10px;}
+  .plan{border:2px solid var(--line); border-radius:14px; padding:13px 15px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; transition:border-color .15s, background .15s;}
+  .plan.on{border-color:var(--teal); background:var(--teal-soft);}
+  .plan .pl{font-weight:700; font-size:.92rem;}
+  .plan .pp{font-weight:800; color:var(--teal-dark); font-size:1rem;}
+  .plan .promo{display:inline-block; font-size:.68rem; font-weight:800; color:#fff; background:var(--teal); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle;}
+
+  .pay{margin-top:14px; background:#F6FBFA; border:1px dashed var(--line); border-radius:14px; padding:14px;}
+  .pay .num{display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:.92rem;}
+  .pay .num b{color:var(--teal-dark); font-size:1.02rem; letter-spacing:.02em;}
+  .pay .op{font-weight:700;}
+  .pay .num.soon{opacity:.55;}
+  .pay .num.soon .soonlbl{font-size:.72rem; font-weight:700; color:var(--amber); background:var(--amber-bg); border-radius:999px; padding:2px 9px;}
+
+  label{display:block; font-size:.78rem; font-weight:700; color:var(--muted); margin:12px 0 5px;}
+  input, select{width:100%; border:2px solid var(--line); border-radius:12px; padding:12px; font-size:1rem; background:#fff; outline:none; color:var(--ink);}
+  input:focus, select:focus{border-color:var(--teal);}
+
+  .btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:13px; background:var(--teal); color:#fff; font-size:1rem; font-weight:800; cursor:pointer;}
+  .btn:active{background:var(--teal-dark);}
+  .btn[disabled]{opacity:.6;}
+  .btn.sec{background:#fff; color:var(--teal-dark); border:2px solid var(--line);}
+
+  .msg{font-size:.85rem; font-weight:600; border-radius:11px; padding:11px 13px; margin:12px 0; display:none;}
+  .msg.show{display:block;} .msg.err{color:var(--red); background:var(--red-bg);}
+  .msg.ok{color:var(--green); background:var(--green-bg);} .msg.info{color:var(--amber); background:var(--amber-bg);}
+
+  .acc summary{cursor:pointer; font-weight:700; color:var(--teal-dark); font-size:.9rem; list-style:none;}
+  .acc summary::-webkit-details-marker{display:none;}
+  .acc[open] summary{margin-bottom:10px;}
+
+  .step{display:none;} .step.on{display:block;}
+  .code{display:flex; gap:8px; justify-content:space-between; margin:6px 0;}
+  .code input{text-align:center; font-size:1.4rem; font-weight:800; padding:12px 0;}
+
+  .pay-row{border:1px solid var(--line); border-radius:12px; padding:11px 13px; margin-bottom:9px; font-size:.86rem;}
+  .pay-row .r1{display:flex; justify-content:space-between; font-weight:700; color:var(--ink);}
+  .pay-row .r2{color:var(--muted); font-size:.8rem; margin:3px 0 8px;}
+
+  .foot{text-align:center; font-size:.74rem; color:var(--muted); margin-top:8px; line-height:1.5;}
+  a.back{display:inline-block; margin-top:16px; color:var(--teal-dark); font-weight:700; font-size:.85rem; text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="mark">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8 21h8"/><path d="M14.5 10 19 4.5"/><path d="m17.2 3 3 3"/></svg>
+    </div>
+    <h1>Abonnement Normodose</h1>
+    <p>Accès illimité au calculateur</p>
+  </div>
+
+  <!-- ============ CONNEXION (si pas de session) ============ -->
+  <div class="step" id="s-login">
+    <div class="card">
+      <h2>Connexion</h2>
+      <p class="sub">Connectez-vous avec le compte de l'application.</p>
+      <div class="msg" id="loginMsg"></div>
+
+      <div id="l-form">
+        <label>E-mail</label>
+        <input id="lEmail" type="email" inputmode="email" placeholder="vous@exemple.com">
+        <label>Mot de passe</label>
+        <input id="lPass" type="password" placeholder="••••••••">
+        <button class="btn" id="btnLogin" onclick="login()">Se connecter</button>
+      </div>
+
+      <div id="l-code" style="display:none">
+        <p class="sub">Entrez le code à 6 chiffres reçu par e-mail.</p>
+        <div class="code" id="codeBoxes"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"></div>
+        <button class="btn" id="btnCode" onclick="verifyCode()">Valider</button>
+      </div>
+    </div>
+    <div class="foot">Vous n'avez pas encore de compte ? Créez-le d'abord dans l'application Normodose.</div>
+  </div>
+
+  <!-- ============ TABLEAU DE BORD ============ -->
+  <div class="step" id="s-dash">
+    <div id="statusBox"></div>
+
+    <div class="card">
+      <h2><span class="n">1</span>Choisissez votre formule</h2>
+      <div class="plans" id="plans"></div>
+
+      <div class="pay" id="payBox">
+        <div style="font-size:.85rem; font-weight:700; color:var(--teal-dark); margin-bottom:4px;">Payez <span id="payAmount">—</span> à l'un de ces numéros :</div>
+        <div id="numList"></div>
+        <div style="font-size:.78rem; color:var(--muted); margin-top:6px;">Notez la <b>référence de la transaction</b> reçue par SMS, puis déclarez-la ci-dessous.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">2</span>Déclarez votre paiement</h2>
+      <p class="sub">Une fois le transfert effectué, indiquez la référence. Votre accès sera activé après vérification (en général sous 24 h).</p>
+      <div class="msg" id="decMsg"></div>
+
+      <label>Opérateur</label>
+      <select id="decOp"></select>
+      <label>Référence de la transaction</label>
+      <input id="decRef" type="text" placeholder="Ex : TXN123456789">
+      <label>Votre numéro (celui qui a payé)</label>
+      <input id="decNum" type="tel" inputmode="tel" placeholder="Ex : 07 00 00 00 00">
+      <button class="btn" id="btnDec" onclick="declarer()">J'ai payé — déclarer</button>
+    </div>
+
+    <div class="card">
+      <details class="acc">
+        <summary>J'ai un code d'activation</summary>
+        <div class="msg" id="codeActMsg"></div>
+        <label>Code</label>
+        <input id="actCode" type="text" placeholder="Ex : PD-2026-XK4T9" style="text-transform:uppercase">
+        <button class="btn sec" id="btnAct" onclick="activer()">Activer</button>
+      </details>
+    </div>
+
+    <!-- Panneau admin -->
+    <div class="card" id="adminBox" style="display:none">
+      <h2>Paiements à valider</h2>
+      <p class="sub">Réservé à l'administrateur.</p>
+      <div class="msg" id="adminMsg"></div>
+      <div id="adminList"></div>
+      <button class="btn sec" onclick="chargerAdmin()">Rafraîchir</button>
+    </div>
+
+    <div class="foot"><a class="back" href="index.html">← Retour à l'application</a></div>
+    <div class="foot" style="margin-top:6px"><a href="#" onclick="seDeconnecter();return false;" style="color:var(--muted)">Se déconnecter</a></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+
+/* ============ CONFIG — À REMPLIR ============ */
+const SUPABASE_URL      = "https://rwmuqzamhxziboykyttz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3bXVxemFtaHh6aWJveWt5dHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MzIxMzQsImV4cCI6MjEwNDAwODEzNH0.7rniOIOLE9aIBwnkeKpBOxCUnnjOUEup_afOnOXfuz0";   // <-- la MEME que dans index.html
+
+// Tes numéros pour recevoir les paiements :
+// actif:true = disponible · actif:false = "bientôt disponible" (grisé)
+const RESEAUX = [
+  { code:"wave",         nom:"Wave",         numero:"05 07 43 19 12", actif:true  },  // <-- ton numéro Wave
+  { code:"mtn_money",    nom:"MTN Money",    numero:"05 07 43 19 12", actif:true  },  // <-- ton numéro MTN
+  { code:"orange_money", nom:"Orange Money", numero:"07 00 00 00 00", actif:false },  // bientôt : mettre actif:true + numéro
+  { code:"moov_money",   nom:"Moov Money",   numero:"01 00 00 00 00", actif:false },  // bientôt : mettre actif:true + numéro
+];
+
+// Tarifs (montant en FCFA) — modifiables librement
+const TARIFS = [
+  { plan:"etudiant_mois",     label:"Étudiant · mensuel",     montant:1000  },
+  { plan:"etudiant_an",       label:"Étudiant · annuel",      montant:8000,  promo:"2 mois offerts" },
+  { plan:"prescripteur_mois", label:"Prescripteur · mensuel", montant:2500  },
+  { plan:"prescripteur_an",   label:"Prescripteur · annuel",  montant:20000, promo:"le plus choisi" },
+];
+/* ============================================ */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:true, autoRefreshToken:true } });
+const $ = id => document.getElementById(id);
+const fcfa = n => n.toLocaleString("fr-FR") + " FCFA";
+let planSel = null;
+
+function show(step){ ["login","dash"].forEach(s => $("s-"+s).classList.toggle("on", s===step)); }
+function msg(el, txt, ton){ const m=$(el); m.className="msg show "+(ton||""); m.textContent=txt; }
+function hideMsg(el){ $(el).className="msg"; }
+
+/* ---- Connexion (fallback si pas de session partagée) ---- */
+let emailLogin="";
+async function login(){
+  const email=$("lEmail").value.trim().toLowerCase(), pass=$("lPass").value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg("loginMsg","Entrez un e-mail valide.","err");
+  if(!pass) return msg("loginMsg","Entrez votre mot de passe.","err");
+  $("btnLogin").disabled=true; hideMsg("loginMsg");
+  const { error } = await sb.auth.signInWithPassword({ email, password:pass });
+  $("btnLogin").disabled=false;
+  if(error){
+    if((error.message||"").toLowerCase().includes("not confirmed")){
+      emailLogin=email; await sb.auth.resend({ type:"signup", email });
+      $("l-form").style.display="none"; $("l-code").style.display="block";
+      return msg("loginMsg","Compte non confirmé — un code vient d'être envoyé.","info");
+    }
+    return msg("loginMsg", (error.message||"").toLowerCase().includes("invalid") ? "E-mail ou mot de passe incorrect." : "Erreur de connexion.","err");
+  }
+  await entrer();
+}
+async function verifyCode(){
+  const token=[...$("codeBoxes").querySelectorAll("input")].map(b=>b.value).join("");
+  if(token.length<6) return msg("loginMsg","Entrez les 6 chiffres.","err");
+  $("btnCode").disabled=true;
+  const { error } = await sb.auth.verifyOtp({ email:emailLogin, token, type:"signup" });
+  $("btnCode").disabled=false;
+  if(error) return msg("loginMsg","Code invalide ou expiré.","err");
+  await entrer();
+}
+(function(){
+  const boxes=[...$("codeBoxes").querySelectorAll("input")];
+  boxes.forEach((b,i)=>{
+    b.addEventListener("input",()=>{ b.value=b.value.replace(/\D/g,"").slice(0,1); if(b.value&&i<5) boxes[i+1].focus(); if(boxes.every(x=>x.value)) verifyCode(); });
+    b.addEventListener("keydown",e=>{ if(e.key==="Backspace"&&!b.value&&i>0) boxes[i-1].focus(); });
+    b.addEventListener("paste",e=>{ e.preventDefault(); const d=(e.clipboardData.getData("text")||"").replace(/\D/g,"").slice(0,6); d.split("").forEach((c,j)=>{ if(boxes[j]) boxes[j].value=c; }); if(d.length>=6) verifyCode(); });
+  });
+})();
+
+/* ---- Entrée : afficher le tableau de bord ---- */
+async function entrer(){
+  show("dash");
+  renderPlans();
+  renderReseaux();
+  await rafraichirStatut();
+}
+
+function renderReseaux(){
+  // Numéros affichés (actifs en clair, à venir grisés)
+  $("numList").innerHTML = RESEAUX.map(function(r){
+    return '<div class="num'+(r.actif?'':' soon')+'"><span class="op">'+r.nom+'</span> '
+      + (r.actif ? '<b>'+r.numero+'</b>' : '<span class="soonlbl">bientôt disponible</span>')
+      + '</div>';
+  }).join("");
+  // Menu déroulant : seulement les réseaux actifs
+  $("decOp").innerHTML = RESEAUX.filter(function(r){return r.actif;})
+    .map(function(r){ return '<option value="'+r.code+'">'+r.nom+'</option>'; }).join("");
+}
+
+async function rafraichirStatut(){
+  try{
+    const { data } = await sb.rpc("etat_licence");
+    if(!data) return;
+    const box=$("statusBox");
+    if(data.actif && data.plan==="essai"){
+      const j = data.fin ? Math.max(0, Math.ceil((Date.parse(data.fin)-Date.now())/864e5)) : null;
+      box.innerHTML = '<div class="status trial">Essai en cours'+(j!=null?" — "+j+" jour(s) restant(s)":"")+'. Accès complet.</div>';
+    } else if(data.actif){
+      const d = data.fin ? new Date(data.fin).toLocaleDateString("fr-FR") : "";
+      box.innerHTML = '<div class="status ok">Abonnement actif'+(d?" jusqu'au "+d:"")+'.</div>';
+    } else {
+      box.innerHTML = '<div class="status free">Version gratuite — 10 calculs/jour. Abonnez-vous pour un accès illimité.</div>';
+    }
+    // Panneau admin
+    if(data.type_compte==="admin"){ $("adminBox").style.display="block"; chargerAdmin(); }
+  }catch(_){}
+}
+
+function renderPlans(){
+  $("plans").innerHTML = TARIFS.map((t,i)=>
+    '<div class="plan" data-i="'+i+'" onclick="choisirPlan('+i+')">'
+    +'<span class="pl">'+t.label+(t.promo?'<span class="promo">'+t.promo+'</span>':'')+'</span>'
+    +'<span class="pp">'+fcfa(t.montant)+'</span></div>'
+  ).join("");
+}
+window.choisirPlan=function(i){
+  planSel=TARIFS[i];
+  [...document.querySelectorAll(".plan")].forEach((el,j)=>el.classList.toggle("on", j===i));
+  $("payAmount").textContent = fcfa(planSel.montant);
+};
+
+/* ---- Déclaration de paiement ---- */
+async function declarer(){
+  if(!planSel) return msg("decMsg","Choisissez d'abord une formule.","err");
+  const op=$("decOp").value, ref=$("decRef").value.trim(), num=$("decNum").value.trim();
+  if(ref.length<4) return msg("decMsg","Entrez la référence de la transaction.","err");
+  $("btnDec").disabled=true; hideMsg("decMsg");
+  const { data, error } = await sb.rpc("declarer_paiement", {
+    p_operateur:op, p_reference:ref, p_numero:num, p_montant:planSel.montant, p_plan:planSel.plan
+  });
+  $("btnDec").disabled=false;
+  if(error){ return msg("decMsg","Erreur : "+(error.message||"réessayez."),"err"); }
+  if(data && data.ok===false){
+    return msg("decMsg", data.motif==="reference_deja_declaree" ? "Cette référence a déjà été déclarée." : "Déclaration refusée.","err");
+  }
+  msg("decMsg","Paiement déclaré ✓ Votre accès sera activé après vérification.","ok");
+  $("decRef").value="";
+}
+
+/* ---- Activation par code ---- */
+async function activer(){
+  const code=$("actCode").value.trim().toUpperCase();
+  if(!code) return msg("codeActMsg","Entrez un code.","err");
+  $("btnAct").disabled=true; hideMsg("codeActMsg");
+  const { data, error } = await sb.rpc("activer_code", { p_code:code });
+  $("btnAct").disabled=false;
+  if(error){ return msg("codeActMsg","Erreur, réessayez.","err"); }
+  if(data && data.ok===false){
+    const t={code_inconnu:"Code inconnu.",code_deja_utilise:"Code déjà utilisé.",code_expire:"Code expiré."};
+    return msg("codeActMsg", t[data.motif]||"Code invalide.","err");
+  }
+  msg("codeActMsg","Code activé ✓ Accès débloqué.","ok");
+  $("actCode").value="";
+  rafraichirStatut();
+}
+
+/* ---- Admin : valider les paiements déclarés ---- */
+async function chargerAdmin(){
+  hideMsg("adminMsg");
+  const { data, error } = await sb.rpc("paiements_declares");
+  if(error){ return msg("adminMsg","Accès refusé ou erreur.","err"); }
+  if(!data || !data.length){ $("adminList").innerHTML='<div class="sub">Aucun paiement en attente.</div>'; return; }
+  $("adminList").innerHTML = data.map(p=>
+    '<div class="pay-row">'
+    +'<div class="r1"><span>'+(p.nom||p.email)+'</span><span>'+fcfa(p.montant_fcfa)+'</span></div>'
+    +'<div class="r2">'+p.plan_vise+' · '+p.operateur+' · réf '+p.reference+(p.numero_payeur?' · '+p.numero_payeur:'')+'</div>'
+    +'<button class="btn sec" style="margin-top:0" onclick="valider(\''+p.id+'\')">Valider ce paiement</button>'
+    +'</div>'
+  ).join("");
+}
+window.valider=async function(id){
+  const { data, error } = await sb.rpc("valider_paiement", { p_paiement_id:id });
+  if(error){ return msg("adminMsg","Erreur : "+(error.message||""),"err"); }
+  if(data && data.ok===false){ return msg("adminMsg","Déjà traité.","info"); }
+  msg("adminMsg","Paiement validé ✓ Abonnement activé.","ok");
+  chargerAdmin();
+};
+
+async function seDeconnecter(){ await sb.auth.signOut(); location.reload(); }
+
+/* ---- Démarrage : réutilise la session de l'app si présente (même origine) ---- */
+(async function init(){
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session){ await entrer(); return; }
+  }catch(_){}
+  show("login");
+  $("lPass").addEventListener("keydown",e=>{ if(e.key==="Enter") login(); });
+})();
+</script>
+</body>
+</html>
