@@ -1,7 +1,7 @@
 {
-  "name": "pediadose",
+  "name": "normodose",
   "version": "1.0.0",
-  "description": "Application PediaDose",
+  "description": "Application Normodose",
   "scripts": {
     "test": "node --test"
   }

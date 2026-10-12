@@ -1,5 +1,5 @@
-// NormoDose : Service Worker (offline-first app shell), chemins à plat
-const CACHE = "normodose-4.4.3";
+// Normodose : Service Worker (offline-first app shell), chemins à plat
+const CACHE = "normodose-4.4.4";
 const CORE = ["./", "./index.html", "./abonnement.html", "./manifest.webmanifest"];
 const OPTIONAL = [
   "./icon-192.png","./icon-512.png","./maskable-192.png",

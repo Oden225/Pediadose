@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>NormoDose</title>
+<title>Normodose</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <meta name="theme-color" content="#0F766E">
@@ -491,7 +491,7 @@
     <div class="ring"></div><div class="plate"></div>
     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8 21h8"/><path d="M14.5 10 19 4.5"/><path d="m17.2 3 3 3"/></svg>
   </div>
-  <div class="wordmark">NormoDose</div>
+  <div class="wordmark">Normodose</div>
   <div class="dots"><i></i><i></i><i></i></div>
 </div>
 
@@ -516,7 +516,7 @@
     <div class="icon">
       <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8 21h8"/><path d="M14.5 10 19 4.5"/><path d="m17.2 3 3 3"/></svg>
     </div>
-    <div class="brand">NormoDose</div>
+    <div class="brand">Normodose</div>
 
     <div class="aseg" id="aseg">
       <button type="button" class="on" id="segLogin" onclick="aShow('connexion')">Connexion</button>
@@ -536,7 +536,7 @@
       <input class="afield" id="sNom" type="text" autocomplete="name" placeholder="Nom complet">
       <input class="afield" id="sEmail" type="email" inputmode="email" autocomplete="email" placeholder="E-mail">
       <input class="afield" id="sPass" type="password" autocomplete="new-password" placeholder="Mot de passe (8 caractères min.)">
-      <label class="acheck"><input type="checkbox" id="sPro"><span>Je suis un professionnel ou un étudiant en santé. NormoDose est une aide au calcul et ne remplace pas le jugement clinique.</span></label>
+      <label class="acheck"><input type="checkbox" id="sPro"><span>Je suis un professionnel ou un étudiant en santé. Normodose est une aide au calcul et ne remplace pas le jugement clinique.</span></label>
       <button type="button" id="btnSignup" onclick="aSignup()">Créer mon compte</button>
     </div>
 
@@ -571,7 +571,7 @@
   <div class="htop">
     <div>
       <div id="hgreet">Bonjour,</div>
-      <div id="hname">NormoDose</div>
+      <div id="hname">Normodose</div>
       <div class="hmeta">v3.0</div>
     </div>
     <div id="hini">PD</div>
@@ -640,7 +640,7 @@
   <div class="bub b1"></div>
   <div class="bub" style="bottom:-60px;left:-50px;width:180px;height:180px;background:rgba(255,255,255,.05);"></div>
   <div class="pavatar" id="pini">PD</div>
-  <div class="pname" id="pname">NormoDose</div>
+  <div class="pname" id="pname">Normodose</div>
   <div class="pver"><i></i>Accès vérifié</div>
 </header>
 <div class="stats">
@@ -688,7 +688,7 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
   </div>
 </div>
-<div class="about"><b style="color:var(--ink);">NormoDose n'est qu'une aide au calcul</b>, rien d'autre : elle ne remplace ni le RCP, ni le cours, ni le jugement clinique. Vérifiez toujours avant de prescrire.</div>
+<div class="about"><b style="color:var(--ink);">Normodose n'est qu'une aide au calcul</b>, rien d'autre : elle ne remplace ni le RCP, ni le cours, ni le jugement clinique. Vérifiez toujours avant de prescrire.</div>
 </div>
 
 <nav id="tabs"><div class="bar">
@@ -2240,7 +2240,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
     document.getElementById("swKeep").classList.toggle("on", PREFS.keepW !== false);
   }
   window.logout = async function(){
-    if(!confirm("Se déconnecter de NormoDose ?")) return;
+    if(!confirm("Se déconnecter de Normodose ?")) return;
     localStorage.removeItem("normodose_ordre");
     if(typeof deconnexion === "function"){ await deconnexion(); }
     else { try{ if(window.sb) await sb.auth.signOut(); }catch(_){} location.reload(); }

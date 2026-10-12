@@ -1,4 +1,4 @@
-// Tests des calculs de doses de NormoDose.
+// Tests des calculs de doses de Normodose.
 // Lancer : npm test   (ou : node --test)
 //
 // Les valeurs attendues sont calculées à la main à partir des formules
