@@ -219,6 +219,7 @@ test("La dose ne diminue jamais quand le poids augmente", () => {
   for (const d of app.DRUGS) {
     const p = d.ped;
     if (!p || d.calc || d.bands || d.multi || d.fixed) continue;
+    if (p.perKgPetit) continue; // dose/kg plus forte sous un seuil de poids (artésunate) : testé à part
     let avant = 0;
     for (const w of POIDS) {
       const dose = dosePrincipale(app.dose(d.id, w));
@@ -228,12 +229,37 @@ test("La dose ne diminue jamais quand le poids augmente", () => {
   }
 });
 
-// ---------------------------------------------------------------- Points à valider par un médecin
-// Incohérences relevées en écrivant ces tests. Elles s'affichent comme « todo »
-// sans faire échouer les tests. Une fois tranchées, les transformer en vrais tests.
+// ---------------------------------------------------------------- Décisions médicales validées
+// Incohérences relevées en écrivant ces tests, tranchées par le médecin responsable.
 
-test.todo("Diazépam (fiche produit) : pas de plafond à 10 mg ; affiche 15 – 30 mg à 30 kg alors que sa note et la fiche Reconstitution disent max 10 mg par administration");
-test.todo("Fer : la dose par prise n'est pas plafonnée ; à 80 kg la fiche affiche 240 mg puis « Maximum sur 24 h : 180 mg »");
-test.todo("Artésunate (fiche produit) : 2,4 mg/kg même sous 20 kg, alors que la fiche Reconstitution applique 3 mg/kg (OMS)");
-test.todo("Acide niflumique : sous 10 kg, l'arrondi force 1 suppositoire de 400 mg (ex. 5 kg → 80 mg/kg)");
-test.todo("Plafonds absents à confirmer : phénobarbital (1 600 mg à 80 kg), quinine (640 mg par perfusion et 800 ml de dilution à 80 kg), ceftriaxone limitée à 2 g même en méningite");
+test("Diazépam (fiche produit) : aligné sur la fiche Reconstitution, 0,5 mg/kg en IR, max 10 mg", () => {
+  // 12 kg : 6 mg ; 30 kg : 15 mg → plafonné à 10 mg
+  contient(app.dose("diaz", 12), "≈ 6 mg / prise");
+  contient(app.dose("diaz", 30), "≈ 10 mg / prise", "Plafond appliqué");
+  contient(app.dose("diaz", 80), "≈ 10 mg / prise");
+});
+
+test("Fer : dose journalière plafonnée au maximum affiché (180 mg/j)", () => {
+  // 30 kg : 90 mg ; 80 kg : 240 mg → plafonné à 180 mg, cohérent avec le maximum sur 24 h
+  contient(app.dose("fer", 30), "≈ 90 mg / prise", "Maximum sur 24 h : 90 mg");
+  contient(app.dose("fer", 80), "≈ 180 mg / prise", "Maximum sur 24 h : 180 mg", "Plafond appliqué");
+});
+
+test("Artésunate (fiche produit) : 3 mg/kg sous 20 kg, 2,4 mg/kg au-delà, comme la Reconstitution", () => {
+  // 12 kg : 36 mg ; 19 kg : 57 mg ; 20 kg : 48 mg ; 30 kg : 72 mg
+  contient(app.dose("artesu", 12), "≈ 36 mg / prise");
+  contient(app.dose("artesu", 19), "≈ 57 mg / prise");
+  contient(app.dose("artesu", 20), "≈ 48 mg / prise");
+  contient(app.dose("artesu", 30), "≈ 72 mg / prise");
+});
+
+test("Valeurs conservées après relecture : acide niflumique, phénobarbital, quinine, ceftriaxone", () => {
+  // Acide niflumique : 1 suppositoire minimum, même sous 10 kg
+  contient(app.dose("niflu", 5), "≈ 1 suppositoire(s)");
+  // Phénobarbital : pas de plafond sur la dose de charge
+  contient(app.recon("gardenal", 80), "1 200 – 1 600 mg");
+  // Quinine : 8 mg/kg et 10 ml/kg sans plafond
+  contient(app.recon("quinine", 80), "640 mg", "800 ml");
+  // Ceftriaxone : plafond 2 g/j
+  contient(app.dose("ceftri", 80), "≈ 2 000 mg / jour");
+});

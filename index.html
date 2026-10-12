@@ -1097,8 +1097,8 @@ const DRUGS=[
   d:{s:"ok",t:"RAS."}, s:{s:"ok",t:"RAS."}},
 
  {id:"artesu", nom:"Artésunate", cls:PALU, tag:"Palu grave", urgent:true,
-  ped:{perKg:2.4, freq:"IV lente à H0, H12, H24, puis ×1/j",
-   note:"OMS : 3 mg/kg par dose si poids < 20 kg. Relais ACT dès que possible."},
+  ped:{perKg:2.4, perKgPetit:{sous:20, k:3}, freq:"IV lente à H0, H12, H24, puis ×1/j",
+   note:"OMS : 3 mg/kg par dose sous 20 kg, 2,4 mg/kg au-delà. Relais ACT dès que possible."},
   adulte:"2,4 mg/kg même schéma.",
   g:{s:"ok",t:"Traitement du palu grave, y compris grossesse."},
   a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."},
@@ -1213,7 +1213,7 @@ const DRUGS=[
 
 // ---------- ANTICONVULSIVANTS ----------
  {id:"diaz", nom:"Diazépam (Valium)", cls:ACV, tag:"Crise", urgent:true,
-  ped:{perKg:[0.5,1], freq:"par jour, IR / IM / VO ; renouvelable à 30 min si échec", maxJour:0, 
+  ped:{perKg:0.5, freq:"par administration en intrarectal (IV lente : 0,3 mg/kg, max 10 mg) ; renouvelable à 30 min si échec", maxPrise:10,
    note:"Max 3 mg/kg/j (cours). En pratique IR au cabinet : 0,5 mg/kg sans dépasser 10 mg par administration. Surveillance respiratoire."},
   adulte:"10 mg IR ou IV lente.",
   g:{s:"w",t:"Convulsions + grossesse : penser éclampsie → MgSO₄ + transfert."},
@@ -1338,7 +1338,7 @@ const DRUGS=[
   r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Surveiller les transaminases si cure prolongée."}},
 
  {id:"fer", nom:"Fer élément", cls:AUT, tag:"Anémie ferriprive",
-  ped:{perKg:3, freq:"par jour, en 1-2 prises (jusqu'à 6 mg/kg/j selon sévérité)", maxJour:180,
+  ped:{perKg:3, freq:"par jour, en 1-2 prises (jusqu'à 6 mg/kg/j selon sévérité)", maxPrise:180, maxJour:180,
    note:"Contrôle NFS ; à distance du thé."},
   adulte:"100-200 mg/j de fer élément.",
   g:{s:"ok",t:"Recommandé si carence (+ acide folique)."},
@@ -1780,7 +1780,8 @@ function pedBlock(d,w,m){
 
   const unit=p.unit||"mg"; let capped=false, per, line2="";
   if(p.perKg!==undefined){
-    per=rng(p.perKg).map(k=>k*w);
+    const pk=(p.perKgPetit&&w<p.perKgPetit.sous)?p.perKgPetit.k:p.perKg;
+    per=rng(pk).map(k=>k*w);
     if(unit!=="mg") per=per.map(v=>Math.max(1,p.round==="floor"?Math.floor(v):Math.round(v)));
     if(p.maxPrise){ if(per[1]>p.maxPrise) capped=true;
       per=per.map(v=>Math.min(v,p.maxPrise)); }
