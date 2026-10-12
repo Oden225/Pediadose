@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Normodose — Abonnement</title>
+<title>Normodose · Abonnement</title>
 <meta name="theme-color" content="#0F766E">
 <style>
   :root{
@@ -122,7 +122,7 @@
       <div class="plans" id="plans"></div>
 
       <div class="pay" id="payBox">
-        <div style="font-size:.85rem; font-weight:700; color:var(--teal-dark); margin-bottom:4px;">Payez <span id="payAmount">—</span> à l'un de ces numéros :</div>
+        <div style="font-size:.85rem; font-weight:700; color:var(--teal-dark); margin-bottom:4px;">Payez <span id="payAmount"></span> à l'un de ces numéros :</div>
         <div id="numList"></div>
         <div style="font-size:.78rem; color:var(--muted); margin-top:6px;">Notez la <b>référence de la transaction</b> reçue par SMS, puis déclarez-la ci-dessous.</div>
       </div>
@@ -139,7 +139,7 @@
       <input id="decRef" type="text" placeholder="Ex : TXN123456789">
       <label>Votre numéro (celui qui a payé)</label>
       <input id="decNum" type="tel" inputmode="tel" placeholder="Ex : 07 00 00 00 00">
-      <button class="btn" id="btnDec" onclick="declarer()">J'ai payé — déclarer</button>
+      <button class="btn" id="btnDec" onclick="declarer()">J'ai payé : déclarer</button>
     </div>
 
     <div class="card">
@@ -171,7 +171,7 @@
 <script>
 "use strict";
 
-/* ============ CONFIG — À REMPLIR ============ */
+/* ============ CONFIG : À REMPLIR ============ */
 const SUPABASE_URL      = "https://rwmuqzamhxziboykyttz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3bXVxemFtaHh6aWJveWt5dHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MzIxMzQsImV4cCI6MjEwNDAwODEzNH0.7rniOIOLE9aIBwnkeKpBOxCUnnjOUEup_afOnOXfuz0";   // <-- la MEME que dans index.html
 
@@ -184,7 +184,7 @@ const RESEAUX = [
   { code:"moov_money",   nom:"Moov Money",   numero:"01 00 00 00 00", actif:false },  // bientôt : mettre actif:true + numéro
 ];
 
-// Tarifs (montant en FCFA) — modifiables librement
+// Tarifs (montant en FCFA), modifiables librement
 const TARIFS = [
   { plan:"etudiant_mois",     label:"Étudiant · mensuel",     montant:1000  },
   { plan:"etudiant_an",       label:"Étudiant · annuel",      montant:8000,  promo:"2 mois offerts" },
@@ -215,7 +215,7 @@ async function login(){
     if((error.message||"").toLowerCase().includes("not confirmed")){
       emailLogin=email; await sb.auth.resend({ type:"signup", email });
       $("l-form").style.display="none"; $("l-code").style.display="block";
-      return msg("loginMsg","Compte non confirmé — un code vient d'être envoyé.","info");
+      return msg("loginMsg","Compte non confirmé : un code vient d'être envoyé.","info");
     }
     return msg("loginMsg", (error.message||"").toLowerCase().includes("invalid") ? "E-mail ou mot de passe incorrect." : "Erreur de connexion.","err");
   }
@@ -266,12 +266,12 @@ async function rafraichirStatut(){
     const box=$("statusBox");
     if(data.actif && data.plan==="essai"){
       const j = data.fin ? Math.max(0, Math.ceil((Date.parse(data.fin)-Date.now())/864e5)) : null;
-      box.innerHTML = '<div class="status trial">Essai en cours'+(j!=null?" — "+j+" jour(s) restant(s)":"")+'. Accès complet.</div>';
+      box.innerHTML = '<div class="status trial">Essai en cours'+(j!=null?" : "+j+" jour(s) restant(s)":"")+'. Accès complet.</div>';
     } else if(data.actif){
       const d = data.fin ? new Date(data.fin).toLocaleDateString("fr-FR") : "";
       box.innerHTML = '<div class="status ok">Abonnement actif'+(d?" jusqu'au "+d:"")+'.</div>';
     } else {
-      box.innerHTML = '<div class="status free">Version gratuite — 10 calculs/jour. Abonnez-vous pour un accès illimité.</div>';
+      box.innerHTML = '<div class="status free">Version gratuite : 10 calculs/jour. Abonnez-vous pour un accès illimité.</div>';
     }
     // Panneau admin
     if(data.type_compte==="admin"){ $("adminBox").style.display="block"; chargerAdmin(); }
