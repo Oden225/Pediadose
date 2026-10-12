@@ -1,5 +1,8 @@
 {
   "name": "pediadose",
   "version": "1.0.0",
-  "description": "Application PediaDose"
+  "description": "Application PediaDose",
+  "scripts": {
+    "test": "node --test"
+  }
 }
