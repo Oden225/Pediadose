@@ -870,8 +870,20 @@ function relock(){
   const chk=$a("sPro"); if(chk) chk.checked=false;
   try{ if(window.showTab) showTab("calc"); }catch(_){}
 }
+// Supprime du cache du service worker tout ce qui ne vient pas de l'application elle-même
+// (anciennes réponses Supabase liées à un compte).
+async function viderCacheApi(){
+  try{
+    if(!window.caches) return;
+    for(const nom of await caches.keys()){
+      const c = await caches.open(nom);
+      for(const req of await c.keys()){ if(new URL(req.url).origin !== location.origin) await c.delete(req); }
+    }
+  }catch(_){}
+}
 async function deconnexion(){
   try{ await sb.auth.signOut(); }catch(_){}
+  await viderCacheApi();
   localStorage.removeItem("nd_licence");
   try{ if(window.histWipeLocal) window.histWipeLocal(); }catch(_){}
   relock();
@@ -880,6 +892,7 @@ async function supprimerCompte(){
   if(!confirm("Supprimer définitivement votre compte ? Action irréversible.")) return;
   try{ await sb.rpc("supprimer_mon_compte"); }catch(_){}
   try{ await sb.auth.signOut(); }catch(_){}
+  await viderCacheApi();
   localStorage.removeItem("nd_licence");
   try{ if(window.histWipeLocal) window.histWipeLocal(); }catch(_){}
   relock();
@@ -2148,7 +2161,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
     if(diff === 0) return "Aujourd'hui"; if(diff === 1) return "Hier";
     return new Date(t).toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
   }
-  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
   function passes(e){
     if(HF === "Tout") return true;
     if(HF === "Perfusion") return e.cls === PERF;
@@ -2167,10 +2180,11 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
   }
   var OPEN = {};
   window.setHF = function(f){ HF = f; renderHist(); };
-  window.togSess = function(k){ OPEN[k] = !OPEN[k]; var el = document.querySelector('.sess[data-k="'+k+'"]'); if(el) el.classList.toggle("open", OPEN[k]); };
+  window.togSess = function(k, el){ OPEN[k] = !OPEN[k]; if(el) el.classList.toggle("open", OPEN[k]); };
   window.reopen = function(w, m, mode){
     document.getElementById("w").value = w || "";
-    document.getElementById("m").value = (m === null || m === undefined || m === "null") ? "" : m;
+    document.getElementById("m").value = (m === null || m === undefined || m === "null" || m === "" || isNaN(Number(m))) ? "" : Number(m);
+    mode = (mode === "adulte") ? "adulte" : "enfant";
     if(S.mode !== mode) setMode(mode); else render();
     savePrefs(); showTab("calc"); window.scrollTo({ top:0 });
     toast("Session rouverte" + (w ? " · " + fr(w) + " kg" : ""));
@@ -2199,7 +2213,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
       var time = s.from === s.to ? hhmm(s.to) : hhmm(s.from) + " → " + hhmm(s.to);
       var k = s.key + "|" + s.to;
       out += '<div class="sess' + (OPEN[k] ? " open" : "") + '" data-k="' + esc(k) + '">'
-        + '<div class="srow" onclick="togSess(\'' + esc(k) + '\')">'
+        + '<div class="srow" onclick="togSess(this.parentNode.dataset.k, this.parentNode)">'
         + '<div class="stile' + (urg ? " urg" : "") + '"><b>' + (s.w ? fr(s.w) : "") + '</b><small>KG</small></div>'
         + '<div class="sbody"><div class="sttl"><span>' + title + '</span><time>' + time + '</time></div>'
         + '<div class="ssub">' + s.items.length + (s.items.length>1 ? " calculs" : " calcul") + ' · ' + esc(names.slice(0,3).join(", ")) + (names.length>3 ? "…" : "") + '</div></div>'
@@ -2209,7 +2223,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
         + '<div class="sitems">' + s.items.slice().reverse().map(function(e){
             return '<div class="sitem"><div><b>' + esc(e.nom) + '</b>' + esc(e.dose) + '</div><time>' + hhmm(e.t) + '</time></div>';
           }).join("") + '</div>'
-        + '<button class="sbtn" onclick="reopen(' + s.w + ',' + s.m + ',\'' + s.mode + '\')">Rouvrir cette session' + (s.w ? " · " + fr(s.w) + " kg" : "") + '</button>'
+        + '<button class="sbtn" data-w="' + esc(s.w) + '" data-m="' + esc(s.m) + '" data-mode="' + esc(s.mode) + '" onclick="reopen(Number(this.dataset.w) || 0, this.dataset.m, this.dataset.mode)">Rouvrir cette session' + (s.w ? " · " + fr(s.w) + " kg" : "") + '</button>'
         + '</div>';
     });
     out += '<div class="hnote">Aucune donnée nominative : seuls le poids, l\'âge et les doses calculées sont conservés, sur cet appareil.</div>';

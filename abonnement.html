@@ -196,6 +196,8 @@ const TARIFS = [
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:true, autoRefreshToken:true } });
 const $ = id => document.getElementById(id);
 const fcfa = n => n.toLocaleString("fr-FR") + " FCFA";
+// Échappe un texte avant de l'insérer dans du HTML (contenu ou attribut).
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 let planSel = null;
 
 function show(step){ ["login","dash"].forEach(s => $("s-"+s).classList.toggle("on", s===step)); }
@@ -334,9 +336,9 @@ async function chargerAdmin(){
   if(!data || !data.length){ $("adminList").innerHTML='<div class="sub">Aucun paiement en attente.</div>'; return; }
   $("adminList").innerHTML = data.map(p=>
     '<div class="pay-row">'
-    +'<div class="r1"><span>'+(p.nom||p.email)+'</span><span>'+fcfa(p.montant_fcfa)+'</span></div>'
-    +'<div class="r2">'+p.plan_vise+' · '+p.operateur+' · réf '+p.reference+(p.numero_payeur?' · '+p.numero_payeur:'')+'</div>'
-    +'<button class="btn sec" style="margin-top:0" onclick="valider(\''+p.id+'\')">Valider ce paiement</button>'
+    +'<div class="r1"><span>'+esc(p.nom||p.email)+'</span><span>'+esc(fcfa(Number(p.montant_fcfa)||0))+'</span></div>'
+    +'<div class="r2">'+esc(p.plan_vise)+' · '+esc(p.operateur)+' · réf '+esc(p.reference)+(p.numero_payeur?' · '+esc(p.numero_payeur):'')+'</div>'
+    +'<button class="btn sec" style="margin-top:0" data-id="'+esc(p.id)+'" onclick="valider(this.dataset.id)">Valider ce paiement</button>'
     +'</div>'
   ).join("");
 }
@@ -348,7 +350,18 @@ window.valider=async function(id){
   chargerAdmin();
 };
 
-async function seDeconnecter(){ await sb.auth.signOut(); location.reload(); }
+// Supprime du cache du service worker tout ce qui ne vient pas de l'application elle-même
+// (anciennes réponses Supabase liées à un compte).
+async function viderCacheApi(){
+  try{
+    if(!window.caches) return;
+    for(const nom of await caches.keys()){
+      const c = await caches.open(nom);
+      for(const req of await c.keys()){ if(new URL(req.url).origin !== location.origin) await c.delete(req); }
+    }
+  }catch(_){}
+}
+async function seDeconnecter(){ try{ await sb.auth.signOut(); }catch(_){} await viderCacheApi(); location.reload(); }
 
 /* ---- Démarrage : réutilise la session de l'app si présente (même origine) ---- */
 (async function init(){
