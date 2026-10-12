@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>NormoDose</title>
+<title>Normodose</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <meta name="theme-color" content="#0F766E">
@@ -491,7 +491,7 @@
     <div class="ring"></div><div class="plate"></div>
     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8 21h8"/><path d="M14.5 10 19 4.5"/><path d="m17.2 3 3 3"/></svg>
   </div>
-  <div class="wordmark">NormoDose</div>
+  <div class="wordmark">Normodose</div>
   <div class="dots"><i></i><i></i><i></i></div>
 </div>
 
@@ -516,7 +516,7 @@
     <div class="icon">
       <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8 21h8"/><path d="M14.5 10 19 4.5"/><path d="m17.2 3 3 3"/></svg>
     </div>
-    <div class="brand">NormoDose</div>
+    <div class="brand">Normodose</div>
 
     <div class="aseg" id="aseg">
       <button type="button" class="on" id="segLogin" onclick="aShow('connexion')">Connexion</button>
@@ -536,7 +536,7 @@
       <input class="afield" id="sNom" type="text" autocomplete="name" placeholder="Nom complet">
       <input class="afield" id="sEmail" type="email" inputmode="email" autocomplete="email" placeholder="E-mail">
       <input class="afield" id="sPass" type="password" autocomplete="new-password" placeholder="Mot de passe (8 caractères min.)">
-      <label class="acheck"><input type="checkbox" id="sPro"><span>Je suis un professionnel ou un étudiant en santé. NormoDose est une aide au calcul et ne remplace pas le jugement clinique.</span></label>
+      <label class="acheck"><input type="checkbox" id="sPro"><span>Je suis un professionnel ou un étudiant en santé. Normodose est une aide au calcul et ne remplace pas le jugement clinique.</span></label>
       <button type="button" id="btnSignup" onclick="aSignup()">Créer mon compte</button>
     </div>
 
@@ -571,7 +571,7 @@
   <div class="htop">
     <div>
       <div id="hgreet">Bonjour,</div>
-      <div id="hname">NormoDose</div>
+      <div id="hname">Normodose</div>
       <div class="hmeta">v3.0</div>
     </div>
     <div id="hini">PD</div>
@@ -640,7 +640,7 @@
   <div class="bub b1"></div>
   <div class="bub" style="bottom:-60px;left:-50px;width:180px;height:180px;background:rgba(255,255,255,.05);"></div>
   <div class="pavatar" id="pini">PD</div>
-  <div class="pname" id="pname">NormoDose</div>
+  <div class="pname" id="pname">Normodose</div>
   <div class="pver"><i></i>Accès vérifié</div>
 </header>
 <div class="stats">
@@ -688,7 +688,7 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
   </div>
 </div>
-<div class="about"><b style="color:var(--ink);">NormoDose n'est qu'une aide au calcul</b>, rien d'autre : elle ne remplace ni le RCP, ni le cours, ni le jugement clinique. Vérifiez toujours avant de prescrire.</div>
+<div class="about"><b style="color:var(--ink);">Normodose n'est qu'une aide au calcul</b>, rien d'autre : elle ne remplace ni le RCP, ni le cours, ni le jugement clinique. Vérifiez toujours avant de prescrire.</div>
 </div>
 
 <nav id="tabs"><div class="bar">
@@ -870,8 +870,20 @@ function relock(){
   const chk=$a("sPro"); if(chk) chk.checked=false;
   try{ if(window.showTab) showTab("calc"); }catch(_){}
 }
+// Supprime du cache du service worker tout ce qui ne vient pas de l'application elle-même
+// (anciennes réponses Supabase liées à un compte).
+async function viderCacheApi(){
+  try{
+    if(!window.caches) return;
+    for(const nom of await caches.keys()){
+      const c = await caches.open(nom);
+      for(const req of await c.keys()){ if(new URL(req.url).origin !== location.origin) await c.delete(req); }
+    }
+  }catch(_){}
+}
 async function deconnexion(){
   try{ await sb.auth.signOut(); }catch(_){}
+  await viderCacheApi();
   localStorage.removeItem("nd_licence");
   try{ if(window.histWipeLocal) window.histWipeLocal(); }catch(_){}
   relock();
@@ -880,6 +892,7 @@ async function supprimerCompte(){
   if(!confirm("Supprimer définitivement votre compte ? Action irréversible.")) return;
   try{ await sb.rpc("supprimer_mon_compte"); }catch(_){}
   try{ await sb.auth.signOut(); }catch(_){}
+  await viderCacheApi();
   localStorage.removeItem("nd_licence");
   try{ if(window.histWipeLocal) window.histWipeLocal(); }catch(_){}
   relock();
@@ -1097,8 +1110,8 @@ const DRUGS=[
   d:{s:"ok",t:"RAS."}, s:{s:"ok",t:"RAS."}},
 
  {id:"artesu", nom:"Artésunate", cls:PALU, tag:"Palu grave", urgent:true,
-  ped:{perKg:2.4, freq:"IV lente à H0, H12, H24, puis ×1/j",
-   note:"OMS : 3 mg/kg par dose si poids < 20 kg. Relais ACT dès que possible."},
+  ped:{perKg:2.4, perKgPetit:{sous:20, k:3}, freq:"IV lente à H0, H12, H24, puis ×1/j",
+   note:"OMS : 3 mg/kg par dose sous 20 kg, 2,4 mg/kg au-delà. Relais ACT dès que possible."},
   adulte:"2,4 mg/kg même schéma.",
   g:{s:"ok",t:"Traitement du palu grave, y compris grossesse."},
   a:{s:"ok",t:"RAS."}, r:{s:"ok",t:"RAS."}, h:{s:"ok",t:"RAS."},
@@ -1213,7 +1226,7 @@ const DRUGS=[
 
 // ---------- ANTICONVULSIVANTS ----------
  {id:"diaz", nom:"Diazépam (Valium)", cls:ACV, tag:"Crise", urgent:true,
-  ped:{perKg:[0.5,1], freq:"par jour, IR / IM / VO ; renouvelable à 30 min si échec", maxJour:0, 
+  ped:{perKg:0.5, freq:"par administration en intrarectal (IV lente : 0,3 mg/kg, max 10 mg) ; renouvelable à 30 min si échec", maxPrise:10,
    note:"Max 3 mg/kg/j (cours). En pratique IR au cabinet : 0,5 mg/kg sans dépasser 10 mg par administration. Surveillance respiratoire."},
   adulte:"10 mg IR ou IV lente.",
   g:{s:"w",t:"Convulsions + grossesse : penser éclampsie → MgSO₄ + transfert."},
@@ -1338,7 +1351,7 @@ const DRUGS=[
   r:{s:"ok",t:"RAS."}, h:{s:"w",t:"Surveiller les transaminases si cure prolongée."}},
 
  {id:"fer", nom:"Fer élément", cls:AUT, tag:"Anémie ferriprive",
-  ped:{perKg:3, freq:"par jour, en 1-2 prises (jusqu'à 6 mg/kg/j selon sévérité)", maxJour:180,
+  ped:{perKg:3, freq:"par jour, en 1-2 prises (jusqu'à 6 mg/kg/j selon sévérité)", maxPrise:180, maxJour:180,
    note:"Contrôle NFS ; à distance du thé."},
   adulte:"100-200 mg/j de fer élément.",
   g:{s:"ok",t:"Recommandé si carence (+ acide folique)."},
@@ -1780,7 +1793,8 @@ function pedBlock(d,w,m){
 
   const unit=p.unit||"mg"; let capped=false, per, line2="";
   if(p.perKg!==undefined){
-    per=rng(p.perKg).map(k=>k*w);
+    const pk=(p.perKgPetit&&w<p.perKgPetit.sous)?p.perKgPetit.k:p.perKg;
+    per=rng(pk).map(k=>k*w);
     if(unit!=="mg") per=per.map(v=>Math.max(1,p.round==="floor"?Math.floor(v):Math.round(v)));
     if(p.maxPrise){ if(per[1]>p.maxPrise) capped=true;
       per=per.map(v=>Math.min(v,p.maxPrise)); }
@@ -2147,7 +2161,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
     if(diff === 0) return "Aujourd'hui"; if(diff === 1) return "Hier";
     return new Date(t).toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
   }
-  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
   function passes(e){
     if(HF === "Tout") return true;
     if(HF === "Perfusion") return e.cls === PERF;
@@ -2166,10 +2180,11 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
   }
   var OPEN = {};
   window.setHF = function(f){ HF = f; renderHist(); };
-  window.togSess = function(k){ OPEN[k] = !OPEN[k]; var el = document.querySelector('.sess[data-k="'+k+'"]'); if(el) el.classList.toggle("open", OPEN[k]); };
+  window.togSess = function(k, el){ OPEN[k] = !OPEN[k]; if(el) el.classList.toggle("open", OPEN[k]); };
   window.reopen = function(w, m, mode){
     document.getElementById("w").value = w || "";
-    document.getElementById("m").value = (m === null || m === undefined || m === "null") ? "" : m;
+    document.getElementById("m").value = (m === null || m === undefined || m === "null" || m === "" || isNaN(Number(m))) ? "" : Number(m);
+    mode = (mode === "adulte") ? "adulte" : "enfant";
     if(S.mode !== mode) setMode(mode); else render();
     savePrefs(); showTab("calc"); window.scrollTo({ top:0 });
     toast("Session rouverte" + (w ? " · " + fr(w) + " kg" : ""));
@@ -2198,7 +2213,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
       var time = s.from === s.to ? hhmm(s.to) : hhmm(s.from) + " → " + hhmm(s.to);
       var k = s.key + "|" + s.to;
       out += '<div class="sess' + (OPEN[k] ? " open" : "") + '" data-k="' + esc(k) + '">'
-        + '<div class="srow" onclick="togSess(\'' + esc(k) + '\')">'
+        + '<div class="srow" onclick="togSess(this.parentNode.dataset.k, this.parentNode)">'
         + '<div class="stile' + (urg ? " urg" : "") + '"><b>' + (s.w ? fr(s.w) : "") + '</b><small>KG</small></div>'
         + '<div class="sbody"><div class="sttl"><span>' + title + '</span><time>' + time + '</time></div>'
         + '<div class="ssub">' + s.items.length + (s.items.length>1 ? " calculs" : " calcul") + ' · ' + esc(names.slice(0,3).join(", ")) + (names.length>3 ? "…" : "") + '</div></div>'
@@ -2208,7 +2223,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
         + '<div class="sitems">' + s.items.slice().reverse().map(function(e){
             return '<div class="sitem"><div><b>' + esc(e.nom) + '</b>' + esc(e.dose) + '</div><time>' + hhmm(e.t) + '</time></div>';
           }).join("") + '</div>'
-        + '<button class="sbtn" onclick="reopen(' + s.w + ',' + s.m + ',\'' + s.mode + '\')">Rouvrir cette session' + (s.w ? " · " + fr(s.w) + " kg" : "") + '</button>'
+        + '<button class="sbtn" data-w="' + esc(s.w) + '" data-m="' + esc(s.m) + '" data-mode="' + esc(s.mode) + '" onclick="reopen(Number(this.dataset.w) || 0, this.dataset.m, this.dataset.mode)">Rouvrir cette session' + (s.w ? " · " + fr(s.w) + " kg" : "") + '</button>'
         + '</div>';
     });
     out += '<div class="hnote">Aucune donnée nominative : seuls le poids, l\'âge et les doses calculées sont conservés, sur cet appareil.</div>';
@@ -2239,7 +2254,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
     document.getElementById("swKeep").classList.toggle("on", PREFS.keepW !== false);
   }
   window.logout = async function(){
-    if(!confirm("Se déconnecter de NormoDose ?")) return;
+    if(!confirm("Se déconnecter de Normodose ?")) return;
     localStorage.removeItem("normodose_ordre");
     if(typeof deconnexion === "function"){ await deconnexion(); }
     else { try{ if(window.sb) await sb.auth.signOut(); }catch(_){} location.reload(); }

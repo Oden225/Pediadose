@@ -1,5 +1,5 @@
-// NormoDose : Service Worker (offline-first app shell), chemins à plat
-const CACHE = "normodose-4.4.2";
+// Normodose : Service Worker (offline-first app shell), chemins à plat
+const CACHE = "normodose-4.4.5";
 const CORE = ["./", "./index.html", "./abonnement.html", "./manifest.webmanifest"];
 const OPTIONAL = [
   "./icon-192.png","./icon-512.png","./maskable-192.png",
@@ -60,6 +60,10 @@ function navigateStrategy(req) {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  // Les appels à Supabase (et à tout autre domaine) passent directement par le réseau :
+  // ils dépendent du compte connecté et ne doivent jamais être mis en cache.
+  if (new URL(req.url).origin !== self.location.origin) return;
+  if (req.headers.has("Authorization")) return;
   if (req.mode === "navigate") { e.respondWith(navigateStrategy(req)); return; }
   e.respondWith(
     caches.match(req).then((cached) =>

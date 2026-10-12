@@ -1,8 +1,8 @@
 {
-  "name": "PédiaDose · Calcul des doses",
+  "name": "Normodose · Calcul des doses",
   "id": "./",
   "version": "2.1.0",
-  "short_name": "PédiaDose",
+  "short_name": "Normodose",
   "description": "Aide au calcul de posologies pédiatriques. Réservé aux professionnels de santé.",
   "lang": "fr",
   "dir": "ltr",
