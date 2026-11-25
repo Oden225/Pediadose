@@ -765,9 +765,18 @@ function aMsg(txt, ton){ const m=$a("amsg"); m.className="err amsg "+(ton||""); 
 function aHideMsg(){ const m=$a("amsg"); m.style.display="none"; m.className="err amsg"; }
 function aLoad(id,on){ const b=$a(id); b.classList.toggle("loading",on); b.disabled=on; }
 const aMailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+// Vrai quand Supabase n'a pas pu être joint (projet en pause, panne, réseau coupé
+// en cours de route) : pas de réponse, réponse 5xx ou erreur réseau de supabase-js.
+function serveurInjoignable(e){
+  if(!e) return false;
+  const m=(e.message||"").toLowerCase(), st=Number(e.status);
+  return e.name==="AuthRetryableFetchError" || st===0 || st>=500
+    || m.includes("failed to fetch") || m.includes("networkerror") || m.includes("load failed") || m.includes("timeout");
+}
 function aTrad(e){
   const m=(e&&e.message||"").toLowerCase();
   if(!navigator.onLine) return "Pas de connexion. Vérifiez votre réseau.";
+  if(serveurInjoignable(e)) return "Le serveur ne répond pas. Réessayez dans quelques minutes.";
   if(m.includes("invalid login")) return "E-mail ou mot de passe incorrect.";
   if(m.includes("not confirmed")) return "Compte non confirmé : entrez le code reçu par e-mail.";
   if(m.includes("already")) return "Un compte existe déjà avec cet e-mail. Connectez-vous.";

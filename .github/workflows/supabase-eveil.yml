@@ -1,0 +1,35 @@
+name: Garder Supabase éveillé
+
+# Supabase met en pause un projet gratuit après 7 jours sans activité.
+# Cette tâche lit la table historique tous les 3 jours avec la clé publique
+# (anon) de l'application : la base reçoit une vraie requête, sans rien modifier.
+# Si la base ne répond pas, la tâche échoue et GitHub prévient par e-mail.
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eveil:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Contacter la base
+        run: |
+          URL=$(grep -o 'SUPABASE_URL *= *"[^"]*"' index.html | cut -d'"' -f2)
+          KEY=$(grep -o 'SUPABASE_ANON_KEY *= *"[^"]*"' index.html | cut -d'"' -f2)
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Adresse ou clé Supabase introuvable dans index.html"; exit 1; fi
+          for essai in 1 2 3; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 30 \
+              -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+              "$URL/rest/v1/historique?select=k&limit=1")
+            echo "Essai $essai : HTTP $CODE"
+            [ "$CODE" = "200" ] && exit 0
+            sleep 20
+          done
+          echo "La base Supabase ne répond pas : vérifiez sur supabase.com qu'elle n'est pas en pause."
+          exit 1
