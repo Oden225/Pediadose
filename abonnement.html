@@ -204,6 +204,15 @@ function show(step){ ["login","dash"].forEach(s => $("s-"+s).classList.toggle("o
 function msg(el, txt, ton){ const m=$(el); m.className="msg show "+(ton||""); m.textContent=txt; }
 function hideMsg(el){ $(el).className="msg"; }
 
+// Vrai quand Supabase n'a pas pu être joint (projet en pause, panne, réseau coupé
+// en cours de route) : pas de réponse, réponse 5xx ou erreur réseau de supabase-js.
+function serveurInjoignable(e){
+  if(!e) return false;
+  const m=(e.message||"").toLowerCase(), st=Number(e.status);
+  return e.name==="AuthRetryableFetchError" || st===0 || st>=500
+    || m.includes("failed to fetch") || m.includes("networkerror") || m.includes("load failed") || m.includes("timeout");
+}
+
 /* ---- Connexion (fallback si pas de session partagée) ---- */
 let emailLogin="";
 async function login(){
@@ -219,6 +228,7 @@ async function login(){
       $("l-form").style.display="none"; $("l-code").style.display="block";
       return msg("loginMsg","Compte non confirmé : un code vient d'être envoyé.","info");
     }
+    if(serveurInjoignable(error)) return msg("loginMsg","Le serveur ne répond pas. Réessayez dans quelques minutes.","err");
     return msg("loginMsg", (error.message||"").toLowerCase().includes("invalid") ? "E-mail ou mot de passe incorrect." : "Erreur de connexion.","err");
   }
   await entrer();
