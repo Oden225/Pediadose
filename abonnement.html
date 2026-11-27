@@ -5,16 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Normodose · Abonnement</title>
 <meta name="theme-color" content="#0F766E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  // Applique le thème choisi dans l'application (Permanence ou Garde) avant l'affichage.
+  try{ if((JSON.parse(localStorage.getItem("pd_prefs")||"{}")||{}).theme==="garde") document.documentElement.dataset.theme="garde"; }catch(_){}
+</script>
 <style>
   :root{
     --teal:#0F766E; --teal-dark:#0B5A54; --teal-soft:#E4F2EF;
-    --ink:#1F2937; --muted:#64748B; --card:#FFFFFF; --line:#DBE7E3;
+    --ink:#10221F; --muted:#5C726E; --card:#FFFFFF; --line:#DBE7E3;
+    --bg:#F1F7F5; --field:#FFFFFF; --pay:#F6FBFA; --on-teal:#FFFFFF;
     --amber:#B45309; --amber-bg:#FDF1E0; --green:#15803D; --green-bg:#E7F4EB;
     --red:#B91C1C; --red-bg:#FCEBEB;
   }
+  /* Thème Garde : mêmes couleurs sombres que l'application */
+  html[data-theme=garde]{--bg:#0A1214; --card:#101D20; --field:#0B1618; --pay:#0B1618; --line:#24393D;
+    --ink:#E8F2F0; --muted:#93A8A4; --teal:#2DD4BF; --teal-dark:#5EEAD4; --teal-soft:#123330; --on-teal:#06302B;
+    --red:#F87171; --red-bg:#341417; --amber:#FBBF24; --amber-bg:#33260C; --green:#4ADE80; --green-bg:#0F2A18;}
+  html[data-theme=garde] .top{background:linear-gradient(160deg,#0E2E2A 0%,#0A2320 100%);}
   *{box-sizing:border-box; margin:0; padding:0;}
-  body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink); font-size:16px; line-height:1.5;
-    background:#F1F7F5; min-height:100vh;}
+  body{font-family:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); font-size:16px; line-height:1.5;
+    background:var(--bg); min-height:100vh;}
   .wrap{max-width:520px; margin:0 auto; padding:max(18px,env(safe-area-inset-top)) 16px 40px;}
 
   .top{background:radial-gradient(120% 90% at 50% -20%, #12897F, var(--teal) 55%, var(--teal-dark));
@@ -39,10 +52,10 @@
   .plan{border:2px solid var(--line); border-radius:14px; padding:13px 15px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; transition:border-color .15s, background .15s;}
   .plan.on{border-color:var(--teal); background:var(--teal-soft);}
   .plan .pl{font-weight:700; font-size:.92rem;}
-  .plan .pp{font-weight:800; color:var(--teal-dark); font-size:1rem;}
-  .plan .promo{display:inline-block; font-size:.68rem; font-weight:800; color:#fff; background:var(--teal); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle;}
+  .plan .pp{font-weight:800; color:var(--teal-dark); font-size:1rem; white-space:nowrap; margin-left:10px;}
+  .plan .promo{display:inline-block; font-size:.68rem; font-weight:800; color:var(--on-teal); background:var(--teal); border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle;}
 
-  .pay{margin-top:14px; background:#F6FBFA; border:1px dashed var(--line); border-radius:14px; padding:14px;}
+  .pay{margin-top:14px; background:var(--pay); border:1px dashed var(--line); border-radius:14px; padding:14px;}
   .pay .num{display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:.92rem;}
   .pay .num b{color:var(--teal-dark); font-size:1.02rem; letter-spacing:.02em;}
   .pay .op{font-weight:700;}
@@ -50,13 +63,13 @@
   .pay .num.soon .soonlbl{font-size:.72rem; font-weight:700; color:var(--amber); background:var(--amber-bg); border-radius:999px; padding:2px 9px;}
 
   label{display:block; font-size:.78rem; font-weight:700; color:var(--muted); margin:12px 0 5px;}
-  input, select{width:100%; border:2px solid var(--line); border-radius:12px; padding:12px; font-size:1rem; background:#fff; outline:none; color:var(--ink);}
+  input, select{width:100%; border:2px solid var(--line); border-radius:12px; padding:12px; font-size:1rem; background:var(--field); outline:none; color:var(--ink);}
   input:focus, select:focus{border-color:var(--teal);}
 
-  .btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:13px; background:var(--teal); color:#fff; font-size:1rem; font-weight:800; cursor:pointer;}
+  .btn{width:100%; margin-top:14px; padding:14px; border:none; border-radius:13px; background:var(--teal); color:var(--on-teal); font-size:1rem; font-weight:800; cursor:pointer;}
   .btn:active{background:var(--teal-dark);}
   .btn[disabled]{opacity:.6;}
-  .btn.sec{background:#fff; color:var(--teal-dark); border:2px solid var(--line);}
+  .btn.sec{background:var(--card); color:var(--teal-dark); border:2px solid var(--line);}
 
   .msg{font-size:.85rem; font-weight:600; border-radius:11px; padding:11px 13px; margin:12px 0; display:none;}
   .msg.show{display:block;} .msg.err{color:var(--red); background:var(--red-bg);}
@@ -76,6 +89,9 @@
 
   .foot{text-align:center; font-size:.74rem; color:var(--muted); margin-top:8px; line-height:1.5;}
   a.back{display:inline-block; margin-top:16px; color:var(--teal-dark); font-weight:700; font-size:.85rem; text-decoration:none;}
+  .plan{min-height:44px;}
+  button:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible,
+  [role="button"]:focus-visible{outline:3px solid var(--teal); outline-offset:2px;}
 </style>
 </head>
 <body>
@@ -278,7 +294,7 @@ async function rafraichirStatut(){
     const box=$("statusBox");
     if(data.actif && data.plan==="essai"){
       const j = data.fin ? Math.max(0, Math.ceil((Date.parse(data.fin)-Date.now())/864e5)) : null;
-      box.innerHTML = '<div class="status trial">Essai en cours'+(j!=null?" : "+j+" jour(s) restant(s)":"")+'. Accès complet.</div>';
+      box.innerHTML = '<div class="status trial">Essai en cours'+(j!=null?" : "+j+(j>1?" jours restants":" jour restant"):"")+'. Accès complet.</div>';
     } else if(data.actif){
       const d = data.fin ? new Date(data.fin).toLocaleDateString("fr-FR") : "";
       box.innerHTML = '<div class="status ok">Abonnement actif'+(d?" jusqu'au "+d:"")+'.</div>';
@@ -292,14 +308,14 @@ async function rafraichirStatut(){
 
 function renderPlans(){
   $("plans").innerHTML = TARIFS.map((t,i)=>
-    '<div class="plan" data-i="'+i+'" onclick="choisirPlan('+i+')">'
+    '<div class="plan" data-i="'+i+'" role="button" tabindex="0" onclick="choisirPlan('+i+')">'
     +'<span class="pl">'+t.label+(t.promo?'<span class="promo">'+t.promo+'</span>':'')+'</span>'
     +'<span class="pp">'+fcfa(t.montant)+'</span></div>'
   ).join("");
 }
 window.choisirPlan=function(i){
   planSel=TARIFS[i];
-  [...document.querySelectorAll(".plan")].forEach((el,j)=>el.classList.toggle("on", j===i));
+  [...document.querySelectorAll(".plan")].forEach((el,j)=>{ el.classList.toggle("on", j===i); el.setAttribute("aria-pressed", j===i ? "true" : "false"); });
   $("payAmount").textContent = fcfa(planSel.montant);
 };
 
@@ -372,6 +388,12 @@ async function viderCacheApi(){
   }catch(_){}
 }
 async function seDeconnecter(){ try{ await sb.auth.signOut(); }catch(_){} await viderCacheApi(); location.reload(); }
+
+/* ---- Accessibilité : Entrée/Espace activent les éléments role="button" ---- */
+document.addEventListener("keydown", function(e){
+  const t=e.target;
+  if((e.key==="Enter"||e.key===" ") && t && t.matches && t.tagName!=="BUTTON" && t.matches('[role="button"]')){ e.preventDefault(); t.click(); }
+});
 
 /* ---- Démarrage : réutilise la session de l'app si présente (même origine) ---- */
 (async function init(){
