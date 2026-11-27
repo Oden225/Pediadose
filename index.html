@@ -93,12 +93,12 @@
   .field.small{flex:1;}
   .field:focus-within{border-color:var(--teal); box-shadow:0 0 0 4px rgba(15,118,110,.1);}
   .field label{display:block; font-size:10.5px; font-weight:800; text-transform:uppercase;
-    letter-spacing:.08em; color:#7A8F8B;}
+    letter-spacing:.08em; color:var(--muted);}
   .field .box{display:flex; align-items:baseline; gap:5px;}
   .field input{border:none; outline:none; width:100%; font-size:27px; font-weight:800;
     color:var(--teal-dark); font-variant-numeric:tabular-nums; background:transparent;}
   .field.small input{font-size:21px;}
-  .field .unit{font-size:14px; font-weight:700; color:#7A8F8B;}
+  .field .unit{font-size:14px; font-weight:700; color:var(--muted);}
 
   .terrains{display:none; gap:8px; margin-top:12px; flex-wrap:wrap;}
   body[data-mode="adulte"] .terrains{display:flex;}
@@ -129,9 +129,9 @@
     animation:fadeUp .26s ease-out both;}
   .search{padding:12px 18px 2px;}
   .search input{width:100%; border:1.5px solid var(--line); border-radius:16px; padding:12px 15px;
-    font-size:14.5px; font-weight:600; outline:none; background:var(--card); color:var(--ink);
+    font-size:16px; font-weight:600; outline:none; background:var(--card); color:var(--ink);
     transition:border-color .2s ease, box-shadow .2s ease;}
-  .search input::placeholder{color:#9DB2AD; font-weight:600;}
+  .search input::placeholder{color:var(--muted); font-weight:600;}
   .search input:focus{border-color:var(--teal); box-shadow:0 0 0 4px rgba(15,118,110,.1);}
 
   /* ===== Fiches ===== */
@@ -149,13 +149,13 @@
   .dose .freq{font-size:13.5px; color:var(--ink); font-weight:600; line-height:1.5;}
   .dose .ml{margin-top:6px; font-size:14px; font-weight:800; color:var(--teal-dark);}
   .dose select{margin-top:8px; width:100%; padding:9px 11px; border:1.5px solid #CFE0DB;
-    border-radius:12px; font-size:13.5px; font-weight:700; background:var(--card); color:var(--ink);}
+    border-radius:12px; font-size:16px; font-weight:700; background:var(--card); color:var(--ink);}
   .meta{margin-top:9px; font-size:12.5px; line-height:1.5; color:var(--muted);}
   .cap{display:inline-block; margin-top:8px; font-size:11.5px; font-weight:800;
     color:var(--amber); background:var(--amber-bg); border-radius:8px; padding:4px 9px;}
   .alert{margin-top:9px; font-size:12.5px; font-weight:700; line-height:1.5;
     color:var(--red); background:var(--red-bg); border-radius:14px; padding:9px 12px;}
-  .empty{color:#9DB2AD; font-size:13.5px; font-weight:500; font-style:italic; padding:6px 2px;}
+  .empty{color:var(--muted); font-size:13.5px; font-weight:500; font-style:italic; padding:6px 2px;}
 
   .trow{display:flex; gap:9px; margin-top:8px; font-size:12.5px; line-height:1.45;
     align-items:flex-start; border-radius:12px; padding:7px 9px;}
@@ -176,11 +176,11 @@
   /* ===== Perfusion / reconstitution ===== */
   .miniin{display:flex; gap:8px; margin-top:11px; flex-wrap:wrap;}
   .miniin label{display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:800;
-    text-transform:uppercase; letter-spacing:.06em; color:#7A8F8B;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--muted);
     border:1.5px solid var(--line); border-radius:14px; padding:7px 12px; background:var(--card);}
   .miniin input{width:60px; border:none; outline:none; background:transparent; text-align:right;
     font-size:18px; font-weight:800; color:var(--teal-dark); font-variant-numeric:tabular-nums;}
-  .miniin select{border:none; outline:none; background:transparent; font-size:13px;
+  .miniin select{border:none; outline:none; background:transparent; font-size:16px; min-height:44px;
     font-weight:800; color:var(--teal-dark);}
   .kv{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;
     padding:7px 0; border-bottom:1px solid rgba(15,45,40,.07); font-size:12.5px; line-height:1.45;}
@@ -193,7 +193,7 @@
   .steps{margin-top:10px; font-size:12.5px; line-height:1.5; color:var(--ink);}
   .steps li{margin:5px 0 0 20px;}
   .recsel{width:100%; margin-bottom:2px; padding:11px 13px; border:1.5px solid var(--line);
-    border-radius:16px; font-size:13.5px; font-weight:700; background:var(--card); color:var(--ink);
+    border-radius:16px; font-size:16px; font-weight:700; background:var(--card); color:var(--ink);
     outline:none;}
   .recsel:focus{border-color:var(--teal);}
 
@@ -261,13 +261,13 @@
     background:#FDECEC; border-radius:12px; padding:11px 13px; display:none; text-align:left;
     animation:fadeUp .24s ease-out both;}
   #gate .err b{word-break:break-all;}
-  #gate .foot{margin-top:18px; font-size:11px; color:#9DB2AD; line-height:1.45;}
+  #gate .foot{margin-top:18px; font-size:11px; color:#5C726E; line-height:1.45;}
   #gate .aseg{display:flex; background:#EAF3F1; border-radius:14px; padding:4px; margin:16px 0 4px;}
   #gate .aseg button{flex:1; margin:0; padding:9px 6px; border:none; border-radius:11px; background:transparent;
     color:#0B5A54; font-size:13.5px; font-weight:800; box-shadow:none; cursor:pointer;}
   #gate .aseg button.on{background:#fff; box-shadow:0 1px 4px rgba(11,90,84,.14);}
   #gate .astep{display:none;} #gate .astep.on{display:block; animation:fadeUp .22s ease-out both;}
-  #gate input.afield{text-align:left; font-size:15px; font-weight:600; letter-spacing:normal; margin-top:10px; padding:13px 14px;}
+  #gate input.afield{text-align:left; font-size:16px; font-weight:600; letter-spacing:normal; margin-top:10px; padding:13px 14px;}
   #gate .acheck{display:flex; gap:9px; align-items:flex-start; text-align:left; margin:12px 2px 2px; cursor:pointer;}
   #gate .acheck input{width:20px; height:20px; margin:2px 0 0; accent-color:#0F766E; flex:none; padding:0;}
   #gate .acheck span{font-size:12px; color:#41564F; line-height:1.45;}
@@ -326,7 +326,7 @@
   #tabs .bar{background:var(--card); border-radius:24px; padding:6px; display:flex; pointer-events:auto;
     box-shadow:0 20px 44px -22px rgba(15,45,40,.6); border:1px solid rgba(15,45,40,.05);}
   .tab{flex:1; position:relative; display:flex; flex-direction:column; align-items:center; gap:3px;
-    padding:8px 0 7px; border:none; border-radius:16px; background:transparent; color:#7A8F8B; cursor:pointer;
+    padding:8px 0 7px; border:none; border-radius:16px; background:transparent; color:var(--muted); cursor:pointer;
     font-size:10.5px; font-weight:800; transition:background .22s ease, color .22s ease, transform .18s ease;}
   .tab:active{transform:scale(.95);}
   .tab.on{background:var(--teal-soft); color:var(--teal-dark);}
@@ -357,7 +357,7 @@
   .stile small{font-size:9.5px; font-weight:800; letter-spacing:.06em; margin-top:2px;}
   .sbody{flex:1; min-width:0;}
   .sttl{display:flex; justify-content:space-between; gap:8px; font-size:15px; font-weight:800; letter-spacing:-.01em;}
-  .sttl time{font-size:12px; font-weight:700; color:#7A8F8B; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .sttl time{font-size:12px; font-weight:700; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums;}
   .ssub{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.4;}
   .schev{flex:none; color:#9DB2AD; transition:transform .26s cubic-bezier(.34,1.2,.4,1);}
   .sess.open .schev{transform:rotate(90deg);}
@@ -370,7 +370,7 @@
     border-bottom:1px solid rgba(15,45,40,.06);}
   .sitem:last-child{border-bottom:none;}
   .sitem b{color:var(--teal-dark); display:block;}
-  .sitem time{color:#7A8F8B; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .sitem time{color:var(--muted); font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums;}
   .sbtn{margin-top:12px; width:100%; border:none; border-radius:14px; padding:12px; text-align:center;
     background:linear-gradient(135deg,var(--teal),var(--teal-dark)); color:#fff; font-size:13.5px; font-weight:800;
     cursor:pointer; box-shadow:0 12px 26px -12px rgba(15,118,110,.8); transition:transform .18s ease;}
@@ -395,10 +395,10 @@
     border:1px solid rgba(15,45,40,.05);}
   .stat b{display:block; font-size:22px; font-weight:800; color:var(--teal-dark); letter-spacing:-.02em;
     font-variant-numeric:tabular-nums;}
-  .stat small{font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#7A8F8B;}
+  .stat small{font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
   .group{margin:12px 18px 0; background:var(--card); border-radius:22px; padding:6px 8px; box-shadow:var(--shadow);
     border:1px solid rgba(15,45,40,.05);}
-  .gt{padding:8px 10px 4px; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#7A8F8B;}
+  .gt{padding:8px 10px 4px; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);}
   .row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 10px;}
   .row+.row{border-top:1px solid var(--line);}
   .rl{font-size:14.5px; font-weight:700;} .rs{font-size:12px; color:var(--muted); margin-top:1px;}
@@ -414,7 +414,7 @@
   .sw i{position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff;
     box-shadow:0 2px 6px rgba(0,0,0,.2); transition:transform .26s cubic-bezier(.34,1.2,.4,1);}
   .sw.on{background:var(--teal);} .sw.on i{transform:translateX(18px);}
-  .about{text-align:center; font-size:11.5px; color:#7A8F8B; line-height:1.6; padding:16px 28px 130px;}
+  .about{text-align:center; font-size:11.5px; color:var(--muted); line-height:1.6; padding:16px 28px 130px;}
 
   .addb{margin-top:12px; width:100%; display:flex; align-items:center; justify-content:center; gap:7px;
     border:1.5px dashed var(--line); background:transparent; color:var(--teal-dark); border-radius:14px;
@@ -480,6 +480,13 @@
   #abo button{margin-top:14px; width:100%; padding:14px; border:none; border-radius:14px;
     background:linear-gradient(135deg,#0f766e,#0b5a54); color:#fff; font-weight:800; font-size:15px; cursor:pointer;}
   #abo button.abolater{margin-top:8px; background:transparent; color:#5C726E; font-weight:700;}
+
+  /* Zones tactiles de 44 px minimum */
+  .cls,.chip{min-height:44px; display:inline-flex; align-items:center;}
+  .addb{min-height:44px;}
+  /* Focus clavier visible sur tout ce qui se pilote */
+  button:focus-visible, select:focus-visible, a:focus-visible,
+  [role="button"]:focus-visible, [role="switch"]:focus-visible{outline:3px solid var(--teal); outline-offset:2px;}
 </style>
 </head>
 <body data-mode="enfant" data-theme="soleil">
@@ -583,8 +590,8 @@
   <div class="pcard">
     <div class="modes">
       <div class="mind"></div>
-      <div class="mode on" id="mEnfant" onclick="setMode('enfant')">Enfant<small>dose au poids</small></div>
-      <div class="mode" id="mAdulte" onclick="setMode('adulte')">Adulte<small>terrains particuliers</small></div>
+      <div class="mode on" id="mEnfant" role="button" tabindex="0" data-press onclick="setMode('enfant')">Enfant<small>dose au poids</small></div>
+      <div class="mode" id="mAdulte" role="button" tabindex="0" data-press onclick="setMode('adulte')">Adulte<small>terrains particuliers</small></div>
     </div>
     <div class="inputs">
       <div class="field">
@@ -597,12 +604,12 @@
       </div>
     </div>
     <div class="terrains">
-      <div class="chip" id="tg" onclick="tog('g')">Grossesse</div>
-      <div class="chip" id="ta" onclick="tog('a')">Sujet âgé</div>
-      <div class="chip" id="tr" onclick="tog('r')">Rein (IR)</div>
-      <div class="chip" id="th" onclick="tog('h')">Foie (IH)</div>
-      <div class="chip" id="td" onclick="tog('d')">Diabète</div>
-      <div class="chip" id="ts" onclick="tog('s')">Asthme</div>
+      <div class="chip" id="tg" role="button" tabindex="0" data-press onclick="tog('g')">Grossesse</div>
+      <div class="chip" id="ta" role="button" tabindex="0" data-press onclick="tog('a')">Sujet âgé</div>
+      <div class="chip" id="tr" role="button" tabindex="0" data-press onclick="tog('r')">Rein (IR)</div>
+      <div class="chip" id="th" role="button" tabindex="0" data-press onclick="tog('h')">Foie (IH)</div>
+      <div class="chip" id="td" role="button" tabindex="0" data-press onclick="tog('d')">Diabète</div>
+      <div class="chip" id="ts" role="button" tabindex="0" data-press onclick="tog('s')">Asthme</div>
     </div>
     <div class="hint" id="hint"></div>
   </div>
@@ -610,7 +617,7 @@
 
 <div class="stick" id="stick">
 <div class="clsbar" id="clsbar"></div>
-<div class="search"><div class="qwrap"><input id="q" type="search" placeholder="Rechercher un produit…" oninput="qInput(this)" autocomplete="off"><button class="qclear" onclick="qClear()" aria-label="Effacer la recherche">×</button></div></div>
+<div class="search"><div class="qwrap"><input id="q" type="search" aria-label="Rechercher un produit" placeholder="Rechercher un produit…" oninput="qInput(this)" autocomplete="off"><button class="qclear" onclick="qClear()" aria-label="Effacer la recherche">×</button></div></div>
 <div class="count" id="count"></div>
 </div>
 <div class="clsnote" id="clsnote" style="display:none"></div>
@@ -666,24 +673,24 @@
   </div>
   <div class="row">
     <div><div class="rl">Retenir le poids</div><div class="rs">30 minutes après la saisie</div></div>
-    <div class="sw on" id="swKeep" onclick="togKeep()" role="switch" aria-label="Retenir le poids"><i></i></div>
+    <div class="sw on" id="swKeep" tabindex="0" onclick="togKeep()" role="switch" aria-label="Retenir le poids"><i></i></div>
   </div>
 </div>
 <div class="group">
   <div class="gt">Compte</div>
-  <div class="row act" onclick="location.href='abonnement.html'">
+  <div class="row act" role="button" tabindex="0" onclick="location.href='abonnement.html'">
     <div><div class="rl">Mon abonnement</div><div class="rs">Passer en illimité · Wave / MTN Money</div></div>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9DB2AD" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
   </div>
-  <div class="row act" onclick="clearHist()">
+  <div class="row act" role="button" tabindex="0" onclick="clearHist()">
     <div><div class="rl">Effacer l'historique</div><div class="rs">Sur tous vos appareils</div></div>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9DB2AD" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
   </div>
-  <div class="row act danger" onclick="logout()">
+  <div class="row act danger" role="button" tabindex="0" onclick="logout()">
     <div class="rl">Se déconnecter</div>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3M21 4v16"/></svg>
   </div>
-  <div class="row act danger" onclick="supprimerCompte()">
+  <div class="row act danger" role="button" tabindex="0" onclick="supprimerCompte()">
     <div><div class="rl">Supprimer mon compte</div><div class="rs">Définitif et irréversible</div></div>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
   </div>
@@ -730,12 +737,14 @@ function greeting(){
   if (h < 18) return "Bon après-midi";
   return "Bonsoir";
 }
+// Nom sans « Dr » de tête : l'application ajoute elle-même le titre.
+function sansDr(n){ return String(n || "").replace(/^\s*(dr\.?\s+)+/i, "").trim(); }
 function unlock(nom, greet){
   document.getElementById("gate").style.display = "none";
   document.getElementById("app").style.display = "block";
   if (nom){
     const w = document.getElementById("who");
-    w.textContent = "Dr " + nom;
+    w.textContent = "Dr " + sansDr(nom);
     w.style.display = "block";
     if (greet) toastWelcome(nom);
   }
@@ -1391,7 +1400,7 @@ function setCls(c){S.cls=c; drawCls(); render();}
 function selForm(id,i){S.formSel[id]=+i; render();}
 function drawCls(){
   document.getElementById("clsbar").innerHTML=CLASSES.map(c=>
-    `<div class="cls${c===S.cls?" on":""}" onclick="setCls('${c.replace(/'/g,"\\'")}')">${c}</div>`).join("");
+    `<div class="cls${c===S.cls?" on":""}" role="button" tabindex="0" data-press onclick="setCls('${c.replace(/'/g,"\\'")}')">${c}</div>`).join("");
   const n=document.getElementById("clsnote"), t=CLASS_NOTES[S.cls];
   n.style.display=t?"block":"none"; if(t) n.textContent=t;
 }
@@ -1554,7 +1563,7 @@ function updSolute(){ const w=parseFloat(document.getElementById("w").value)||0;
   const e=document.getElementById("soluteOut"); if(e) e.innerHTML=soluteOut(w); }
 function setSolute(v){ S.solute=v; updSolute(); }
 function soluteBlock(w){
-  return `<select class="recsel" onchange="setSolute(this.value)">`+
+  return `<select class="recsel" aria-label="Soluté de perfusion" onchange="setSolute(this.value)">`+
     SOLUTES.map(o=>`<option value="${o.id}"${o.id===S.solute?" selected":""}>${o.nom}</option>`).join("")+
     `</select><div id="soluteOut">${soluteOut(w)}</div>`;
 }
@@ -1727,7 +1736,7 @@ function updRecon(){
   const e=document.getElementById("reconOut"); if(e) e.innerHTML=reconOut(w,m); }
 function reconBlock(w,m){
   const grps=[...new Set(RECON.map(r=>r.g))];
-  return `<select class="recsel" onchange="setRecon(this.value)">`+
+  return `<select class="recsel" aria-label="Produit à reconstituer" onchange="setRecon(this.value)">`+
     grps.map(g=>`<optgroup label="${g}">`+
       RECON.filter(r=>r.g===g).map(r=>
         `<option value="${r.id}"${r.id===S.recon?" selected":""}>${r.nom}</option>`).join("")+
@@ -1825,7 +1834,7 @@ function pedBlock(d,w,m){
     const idx=S.formSel[d.id]??0, f=d.forms[idx];
     if(f&&f.c) h+=`<div class="ml num">≈ ${showRange(per.map(v=>v/f.c),fmtMl)} ml par prise <span style="font-weight:500">(${f.l})</span></div>`;
     if(d.forms.length>1){
-      h+=`<select onchange="selForm('${d.id}',this.value)">`+
+      h+=`<select aria-label="Forme et concentration" onchange="selForm('${d.id}',this.value)">`+
         d.forms.map((o,i)=>`<option value="${i}"${i===idx?" selected":""}>${o.l}</option>`).join("")+`</select>`;
     } else if(f&&!f.c) h+=`<div class="ml">${f.l}</div>`;
   }
@@ -1943,6 +1952,23 @@ function render(){
   });
 })();
 drawCls(); render();
+
+/* ---- Accessibilité : les éléments role="button"/"switch" se pilotent au clavier,
+   et leur état (classe « on ») est annoncé aux lecteurs d'écran ---- */
+document.addEventListener("keydown", function(e){
+  var t = e.target;
+  if((e.key === "Enter" || e.key === " ") && t && t.matches && t.tagName !== "BUTTON"
+     && t.matches('[role="button"],[role="switch"]')){ e.preventDefault(); t.click(); }
+});
+function syncAria(){
+  document.querySelectorAll("[data-press]").forEach(function(el){
+    el.setAttribute("aria-pressed", el.classList.contains("on") ? "true" : "false"); });
+  document.querySelectorAll('[role="switch"]').forEach(function(el){
+    el.setAttribute("aria-checked", el.classList.contains("on") ? "true" : "false"); });
+}
+syncAria();
+if (window.MutationObserver) new MutationObserver(syncAria).observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:["class"] });
+
 if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
   navigator.serviceWorker.register("sw.js");
 </script>
@@ -1952,7 +1978,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
   setTimeout(function(){ sp.classList.add("off"); setTimeout(function(){ sp.remove(); }, 600); }, 1500);
 
   function paintIdentity(){
-    var raw = (document.getElementById("who").textContent || "").replace(/^Dr\s*/, "").trim();
+    var raw = sansDr(document.getElementById("who").textContent);
     document.getElementById("hgreet").textContent = greeting() + ",";
     if (raw){
       document.getElementById("hname").textContent = "Dr " + raw;
@@ -1965,7 +1991,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
   window.toastWelcome = function(nom){
     var el = document.getElementById("welcome");
     document.getElementById("wgreet").textContent = greeting() + ", bienvenue";
-    document.getElementById("wname").textContent = "Dr " + nom;
+    document.getElementById("wname").textContent = "Dr " + sansDr(nom);
     el.style.display = "flex"; el.classList.add("off");
     requestAnimationFrame(function(){ el.classList.remove("off"); });
     setTimeout(function(){
@@ -2200,7 +2226,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
   };
   function renderHist(){
     document.getElementById("histFilters").innerHTML = HFS.map(function(f){
-      return '<div class="cls' + (f===HF?" on":"") + '" onclick="setHF(\'' + f + '\')">' + f + '</div>';
+      return '<div class="cls' + (f===HF?" on":"") + '" role="button" tabindex="0" data-press onclick="setHF(\'' + f + '\')">' + f + '</div>';
     }).join("");
     var wk = Date.now() - 7*864e5;
     var nWeek = HIST.filter(function(e){ return e.t > wk; }).length;
@@ -2222,7 +2248,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
       var time = s.from === s.to ? hhmm(s.to) : hhmm(s.from) + " → " + hhmm(s.to);
       var k = s.key + "|" + s.to;
       out += '<div class="sess' + (OPEN[k] ? " open" : "") + '" data-k="' + esc(k) + '">'
-        + '<div class="srow" onclick="togSess(this.parentNode.dataset.k, this.parentNode)">'
+        + '<div class="srow" role="button" tabindex="0" onclick="togSess(this.parentNode.dataset.k, this.parentNode)">'
         + '<div class="stile' + (urg ? " urg" : "") + '"><b>' + (s.w ? fr(s.w) : "") + '</b><small>KG</small></div>'
         + '<div class="sbody"><div class="sttl"><span>' + title + '</span><time>' + time + '</time></div>'
         + '<div class="ssub">' + s.items.length + (s.items.length>1 ? " calculs" : " calcul") + ' · ' + esc(names.slice(0,3).join(", ")) + (names.length>3 ? "…" : "") + '</div></div>'
@@ -2250,7 +2276,7 @@ if (location.protocol.indexOf("http") === 0 && "serviceWorker" in navigator)
 
   /* ---- Profil ---- */
   function renderProfil(){
-    var raw = (document.getElementById("who").textContent || "").replace(/^Dr\s*/, "").trim();
+    var raw = sansDr(document.getElementById("who").textContent);
     if(raw){
       document.getElementById("pname").textContent = "Dr " + raw;
       document.getElementById("pini").textContent = raw.split(/\s+/).filter(Boolean).map(function(s){ return s[0]; }).slice(0,2).join("").toUpperCase();
